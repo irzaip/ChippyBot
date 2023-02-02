@@ -1,0 +1,4 @@
+DEBUG:root:input:maksudnya
+DEBUG:root:input:apa sih?
+DEBUG:root:input:OK
+DEBUG:root:input:KELUAR
