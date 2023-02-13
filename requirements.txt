@@ -1,3 +1,5 @@
+git+https://github.com/Wikidepia/g2p-id
+TTS
 sounddevice >= 0.4.1
 SoundFile >= 0.10.3.post1
 seaborn >= 0.12.2
@@ -7,5 +9,6 @@ matplotlib >= 3.5.0
 scikit-learn >= 1.0.2
 numpy
 pandas
-
+fastapi
+uvicorn[standard]
 
