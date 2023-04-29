@@ -1,6 +1,7 @@
 import os
 from typing import Union
-from fastapi import BackgroundTasks, Depends, FastAPI
+from fastapi import BackgroundTasks, Depends, FastAPI, Body
+from pydantic import BaseModel
 
 from TTS.api import TTS
 from g2p_id import G2P
@@ -12,6 +13,11 @@ app = FastAPI()
 g2p = G2P()
 tts = TTS(model_path="./models/tts/chk_1260k-inf.pth", config_path="./models/tts/config.json", progress_bar=False, gpu=False)
 
+class KataKata(BaseModel):
+    kalimat: str
+    speaker: str
+    playaudio: bool
+    requestaudio: bool
 
 speakers = ['JV-00027', 'JV-00264', 'JV-00658', 'JV-01392', 'JV-01519', 'JV-01932', 'JV-02059', 'JV-02326', 'JV-02884',
  'JV-03187', 'JV-03314', 'JV-03424', 'JV-03727', 'JV-04175', 'JV-04285', 'JV-04588', 'JV-04679', 'JV-04715', 
@@ -28,11 +34,13 @@ speakers = ['JV-00027', 'JV-00264', 'JV-00658', 'JV-01392', 'JV-01519', 'JV-0193
 def katakan(kalimat, speaker, playaudio, returnaudio):
     if speaker not in speakers:
         return {"Proses": "Speaker tidak ada"}
+    kalimat = kalimat
     kalimat = str(g2p(kalimat))
+    print(type(kalimat))
     try:
-        tts.tts_to_file(text=kalimat,speaker=speaker, file_path=os.path.dirname(__file__) + "/" + 'output.wav')
+        tts.tts_to_file(text=kalimat,speaker=speaker, file_path=os.path.dirname(__file__) + 'output.wav')
         if playaudio:
-            playsound(os.path.dirname(__file__) + "/" + 'output.wav')     
+            playsound(os.path.dirname(__file__) + 'output.wav')     
     except:
         pass
 
@@ -41,9 +49,10 @@ def katakan(kalimat, speaker, playaudio, returnaudio):
 async def siap():
     text="saya sudah siap menerima perintah"
     text = str(g2p(text))
+    print(text)
     try:
-        tts.tts_to_file(text=text,speaker="gadis", file_path=os.path.dirname(__file__) + "/" + 'output.wav')
-        playsound(os.path.dirname(__file__) + "/" + 'output.wav')     
+        tts.tts_to_file(text=text,speaker="gadis", file_path=os.path.dirname(__file__) + 'output.wav')
+        playsound(os.path.dirname(__file__) + 'output.wav')     
         return {"Proses": "Selesai"}
     except:
         return {"Proses": "Ada kesalahan terjadi"}
@@ -55,10 +64,26 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 
 @app.post("/katakan")
-async def katakanlah(kalimat: str, speaker: str, playaudio: bool, returnaudio: bool , background_task: BackgroundTasks):
+async def katakanlah(item: KataKata, background_task: BackgroundTasks):
+    print("hasil:", kalimat)
     if speaker not in speakers:
         return {"Proses": "Speaker tidak ada"}
     kalimat = str(g2p(kalimat))
     background_task.add_task(katakan, kalimat, speaker, playaudio, returnaudio)
     return {"Proses": "Selesai", "Katakan" : kalimat, "speaker" : speaker, "playaudio" : playaudio, "returnaudio" : returnaudio }
+
+@app.post("/test")
+def test(item: KataKata):
+    text = "saya sudah siap menerima perintah"
+    print(item.kalimat)
+    text = g2p(text)
+    item.kalimat = str(g2p(item.kalimat))
+    print("text:", text)
+    print("kalimat:", item.kalimat)
+    return {"proses": "oke"}
+
+
+@app.post("/coba")
+def coba(item: KataKata):
+    return item
 
