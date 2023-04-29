@@ -133,3 +133,7 @@ dmypy.json
 node_modules/*
 whatsappbot/*
 whisper/*
+newdata/*
+
+*.zip
+models/tts/chk_1260k-inf.pth
