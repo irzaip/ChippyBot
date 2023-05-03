@@ -5,7 +5,7 @@ import requests, os, openai, random, time, nltk
 
 CONFIG = {}
 CONFIG['logdir'] = './log/'
-TOKEN_LIMIT = 1800
+TOKEN_LIMIT = 1000
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -17,7 +17,8 @@ logging.basicConfig(
 app = FastAPI()
 all_conversation = {}
 whatsapp_web_url = "http://localhost:8000/send" # Replace with your endpoint URL
-    
+
+
 def notify_admin(message):
     pass
 
@@ -38,24 +39,23 @@ def reduce_conversation(messages: list) -> list:
     return messages
     
 
-def ask_gpt(messages: list, prompt: str) -> str:
+def ask_gpt(conv_obj: Conversation, prompt: str) -> str:
     """
     Akses API ke OpenAI, dari prompt menjadi hasil string
     
     input: masuknya list dari Object Conversation.messages
     """
     # cek panjang conversation, potong setengah bila lebih dari TOKEN_LIMIT
-    print("WORD COUNTS:--------------------------> ", count_words(messages))
-    if count_words(messages) > TOKEN_LIMIT:
-        messages = reduce_conversation(messages)
-        logging.debug
-        ('conversation-trunctate the message')
+    print("WORD COUNTS:--------------------------> ", count_words(conv_obj.messages))
+    if count_words(conv_obj.messages) > TOKEN_LIMIT:
+        conv_obj.messages = reduce_conversation(conv_obj.messages)
+        logging.debug('conversation-trunctate the message')
 
-    messages.append({"role" : "user", "content" : prompt})
+    conv_obj.messages.append({"role" : "user", "content" : prompt})
 
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
-      messages=messages,
+      messages=conv_obj.messages,
      max_tokens=2000,
 #      n=1,
 #      stop=None,
@@ -69,7 +69,7 @@ def ask_gpt(messages: list, prompt: str) -> str:
         message = "*BRB* - be right back," + random.choice(alasan)
         notify_admin("Error access GPT")
 
-    messages.append({"role" : "assistant", "content" : message})
+    conv_obj.messages.append({"role" : "assistant", "content" : message})
     time.sleep(random.randint(2,7))
     return message
  
@@ -98,12 +98,18 @@ def add_conversation(user_number, bot_number, message) -> None:
     """create new conversation object"""
     all_conversation.update({user_number : Conversation(user_number, bot_number, message)})
 
-def process_msg(conversation_obj: Conversation, message, **kwargs) -> str:
-    """Buat action untuk object Conversation -> buat object apabila belum ada"""
-    if 'action' in kwargs:
-        messages=all_conversation[conversation_obj.user_number].messages
-        return all_conversation[conversation_obj.user_number].process(kwargs['action'],messages, message)
+def intervent():
+    return True
 
+def process_msg(conversation_obj: Conversation, message) -> str:
+    """Buat action untuk object Conversation -> buat object apabila belum ada"""
+
+    reply = conversation_obj.rivereply(message)
+    print("MY REPLY: ----> ",reply)
+    if reply == "BBB":
+        return getattr(conversation_obj, 'process')(ask_gpt,conversation_obj, message)
+    else:
+        return reply
 
 def save_log(user_number):
     """cari object di all_conversation dict lalu save jadi log file"""
@@ -124,11 +130,19 @@ def save_log(user_number):
     except Exception as e:
         print("Error writing to file:", str(e))
 
+def return_brb():
+    alasan = ["ada tamu.","angkat jemuran.", "karet kendor.", "kasih makan kucing", "ada tamu dateng.", "atep bolong.", "ada kebocoran.", "ada radiasi radioaktif."]
+    message = "*BRB* - be right back, " + random.choice(alasan)
+    return message
 
 @app.post("/messages")
 async def receive_message(message: Message):
     """Terima pesan dari WA"""
     print("Message:",message)
+    
+    if (message.author != '') and (message.text[0:3].lower() != 'gpt'):
+        return None
+    
     if message.type == 'chat':
         #response_text = f"You received a message from {message.user_number}: {message.text}"
         if message.user_number not in all_conversation:
@@ -136,12 +150,13 @@ async def receive_message(message: Message):
 
         #pass conversation object to process
         conversation_obj = all_conversation[message.user_number]
-        response_text = process_msg(conversation_obj, message.text, action=ask_gpt)
-        logging.debug("Returned response: " + str(response_text))
+        response_text = process_msg(conversation_obj, message.text)
+        #
+        # logging.debug("Returned response: " + str(response_text))
         return {"message": str(response_text)}
     else:
         logging.error("Not Chat Type")
-        return {"message" : "uncompatible"}
+        return return_brb()
 
 @app.get("/print_messages/{user_number}")
 async def print_messages(user_number):
