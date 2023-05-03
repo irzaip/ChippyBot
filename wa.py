@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 import logging
-from conversations import Role, Message, InjectedMessage, MessageContent, Conversation
+from conversations import Role, Message, InjectedMessage, MessageContent, Conversation, BotQuestion, ConvMode
 import requests, os, openai, random, time, nltk
+from typing import List
+
 
 CONFIG = {}
 CONFIG['logdir'] = './log/'
 TOKEN_LIMIT = 1000
+BOT_NUMBER = "6285775300227@c.us"
+ADMIN_NUMBER = "62895352277562@c.us"
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -20,23 +24,9 @@ whatsapp_web_url = "http://localhost:8000/send" # Replace with your endpoint URL
 
 
 def notify_admin(message):
-    pass
+    send_to_phone(ADMIN_NUMBER, BOT_NUMBER, message)
+    
 
-def count_words(messages: list) -> int:
-    "Menghitung kata dalam iterasi sebuah value dict"
-    words = []
-    for i in messages:
-        words.extend(nltk.word_tokenize(i['content']))
-    return len(words)
-
-def reduce_conversation(messages: list) -> list:
-    """memotong conversation menjadi setengah percakapan"""
-    print(len(messages))
-    for i in messages:
-        print(i['content'])
-    half_way = int(len(messages) / 2 + 1)
-    messages = messages[:1] + messages[half_way:]
-    return messages
     
 
 def ask_gpt(conv_obj: Conversation, prompt: str) -> str:
@@ -46,12 +36,9 @@ def ask_gpt(conv_obj: Conversation, prompt: str) -> str:
     input: masuknya list dari Object Conversation.messages
     """
     # cek panjang conversation, potong setengah bila lebih dari TOKEN_LIMIT
-    print("WORD COUNTS:--------------------------> ", count_words(conv_obj.messages))
-    if count_words(conv_obj.messages) > TOKEN_LIMIT:
-        conv_obj.messages = reduce_conversation(conv_obj.messages)
-        logging.debug('conversation-trunctate the message')
 
     conv_obj.messages.append({"role" : "user", "content" : prompt})
+    print("WORD COUNTS:--------------------------> ", conv_obj.count_words(conv_obj.messages))
 
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
@@ -61,24 +48,18 @@ def ask_gpt(conv_obj: Conversation, prompt: str) -> str:
 #      stop=None,
 #      temperature=0.7,
     )
-
-    try:
-        message = response.choices[0].message.content
-    except:
-        alasan = ["ada tamu.","angkat jemuran.", "karet kendor.", "kasih makan kucing", "ada tamu dateng.", "atep bolong.", "ada kebocoran.", "ada radiasi radioaktif."]
-        message = "*BRB* - be right back," + random.choice(alasan)
-        notify_admin("Error access GPT")
-
+    ## the calling
+    message = response.choices[0].message.content
     conv_obj.messages.append({"role" : "assistant", "content" : message})
     time.sleep(random.randint(2,7))
     return message
  
-def send_to_phone(to_number, from_number, message) -> None:
+def send_to_phone(user_number, bot_number, message) -> None:
     """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
     message = {
         "message": message, # Replace with your message text
-        "from": from_number, # Replace with the sender number
-        "to": to_number # Replace with out bot number
+        "from": user_number, # Replace with the sender number
+        "to": bot_number # Replace with out bot number
     }
 
     response = requests.post(whatsapp_web_url, json=message)
@@ -103,6 +84,9 @@ def intervent():
 
 def process_msg(conversation_obj: Conversation, message) -> str:
     """Buat action untuk object Conversation -> buat object apabila belum ada"""
+
+    if conversation_obj.mode == ConvMode.ASK:
+        print("***************ASK*************************")
 
     reply = conversation_obj.rivereply(message)
     print("MY REPLY: ----> ",reply)
@@ -138,11 +122,19 @@ def return_brb():
 @app.post("/messages")
 async def receive_message(message: Message):
     """Terima pesan dari WA"""
-    print("Message:",message)
-    
     if (message.author != '') and (message.text[0:3].lower() != 'gpt'):
         return None
     
+    #kalau ada depan gpt. buant.
+    if (message.text[0:3].lower() == 'gpt'):
+        message.text = message.text[3:]
+
+    #buang aja karakter unicode
+    message.text = message.text.encode('ascii', errors='ignore').decode()
+    print("-------------------------------------------------")
+    print("Message:",message)
+    print("-------------------------------------------------")
+
     if message.type == 'chat':
         #response_text = f"You received a message from {message.user_number}: {message.text}"
         if message.user_number not in all_conversation:
@@ -150,8 +142,12 @@ async def receive_message(message: Message):
 
         #pass conversation object to process
         conversation_obj = all_conversation[message.user_number]
-        response_text = process_msg(conversation_obj, message.text)
-        #
+        try:
+            response_text = process_msg(conversation_obj, message.text)
+        except Exception as err:
+            print(">>>>>>>>>>>>>>>> ERROR : " + f"{str(type(err))}<<<<<<<<<<<<<<<<<<<<<")
+            notify_admin(f"Ada error {str(type(err))}nih!")
+        
         # logging.debug("Returned response: " + str(response_text))
         return {"message": str(response_text)}
     else:
@@ -194,3 +190,28 @@ async def set_content(message_content: MessageContent):
     logging.debug(f"Inject:{message_content.role}:{content} to {message_content.user_number}")
 
 
+@app.put('/botquestion/{user_number}')
+async def put_botquestion(user_number, botquestion: List[BotQuestion]):
+    # Menambahkan data yang diterima ke dalam list
+
+    if user_number not in all_conversation:
+        conv_obj = all_conversation.update({user_number : Conversation(user_number, BOT_NUMBER , "")})
+
+    conv_obj = all_conversation[user_number]
+    conv_obj.botquestions.extend(botquestion)
+    return {'message': 'Data berhasil ditambahkan!'}
+
+@app.get('/convmode/{user_number}/{convmode}')
+async def convmode(user_number, convmode: ConvMode):
+    if user_number not in all_conversation: 
+        return {'detail' : 'user dont exist'}
+    all_conversation[user_number].mode = convmode
+    return {'detail' : f'set to {convmode}'}
+
+@app.get('/botq/{user_number}')
+async def get_botq(user_number):    
+    return {'message': str(all_conversation[user_number].botquestions) }
+
+@app.get('/getmode/{user_number}')
+async def getmode(user_number):    
+    return {'message': str(all_conversation[user_number].mode) }

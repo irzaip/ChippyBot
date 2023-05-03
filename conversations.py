@@ -2,12 +2,20 @@ from pydantic import BaseModel
 from enum import Enum, auto
 from rivescript import RiveScript
 from dataclasses import dataclass
+import nltk
+
+MAX_TOKEN = 4192
+WORD_LIMIT = 1000
 
 class Role(str, Enum):
     SYSTEM = auto()
     USER = auto()
     ASSISTANT = auto()
 
+class ConvMode(str, Enum):
+    CHITCHAT = auto()
+    ASK = auto()
+    THINK = auto()
 
 class Message(BaseModel):
     """class message untuk perpindahan dari WA"""
@@ -37,11 +45,16 @@ class MessageContent(BaseModel):
 class Conversation():
     """create conversation object unique to user"""
     def __init__(self, user_number, bot_number, messages):
+        if not bot_number:
+            bot_number = "6285775300227@c.us"
         self.rivebot = RiveScript()
         self.rivebot.load_directory('./rive/brain')
         self.rivebot.sort_replies()
+        self.mode=ConvMode.CHITCHAT
         self.messages = []
-        self.max_token = 4192
+        self.botquestions = []
+        self.MAX_TOKEN = MAX_TOKEN
+        self.WORD_LIMIT = WORD_LIMIT
         self.temperature = 0.7
         self.user_number = user_number
         self.bot_number = bot_number
@@ -86,8 +99,27 @@ class Conversation():
         return f"user{self.user_number}"
     
     def process(self, func, messages, message):
+        if (self.count_words(self.messages) > self.WORD_LIMIT):
+            self.messages = self.reduce_conversation(self.messages)
         self.response = func(messages, message)
         return self.response
+
+    def count_words(self, messages: list) -> int:
+        "Menghitung kata dalam iterasi sebuah value dict"
+        words = []
+        for i in messages:
+            words.extend(nltk.word_tokenize(i['content']))
+        return len(words)
+
+    def reduce_conversation(self, messages: list) -> list:
+        """memotong conversation menjadi setengah percakapan"""
+        print(len(messages))
+        for i in messages:
+            print(i['content'])
+        half_way = int(len(messages) / 2 + 1)
+        messages = messages[:1] + messages[half_way:]
+        return messages
+
 
 @dataclass
 class BotQuestion():

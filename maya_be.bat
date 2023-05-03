@@ -1,1 +1,2 @@
-uvicorn mayachat_be:app --reload
+uvicorn wa:app --reload --port 8998 --no-use-colors
+
