@@ -1,36 +1,59 @@
 from fastapi import FastAPI
-import logging
 from conversations import Message, BotQuestion, ConvMode, Script
-from conversations import MessageContent, Conversation, MsgProcessor
-import requests, os, openai, random, time
+from conversations import MessageContent, Conversation, Persona
+from Msgproc import MsgProcessor
+import requests, os, random, sys
 from typing import List
 import asyncio
 import nest_asyncio
+import json
+import pprint
+import random, string
+import logging
+from db_oper import new_db_connection, update_db_connection, get_db_all_connection, get_db_connection
+import toml
 
+cfg = toml.load('config.toml')
 
 CONFIG = {}
-CONFIG['logdir'] = './log/'
-TOKEN_LIMIT = 1000
-BOT_NUMBER = "6285775300227@c.us"
-ADMIN_NUMBER = "62895352277562@c.us"
 
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    filename=CONFIG['logdir'] + 'wa.log'
+    filename=cfg['CONFIG']['LOGDIR'] + 'wa.log'
 )
 
 app = FastAPI()
 conversations = {}
+result = get_db_all_connection('cipibot.db')
+
+def add_conversation(user_number:str, bot_number: str) -> None:
+    """create new conversation object"""    
+    conversations.update({user_number : Conversation(user_number, bot_number)})
+    result = get_db_connection(user_number=user_number, bot_number=bot_number, db_name='cipibot.db') 
+    if not result:
+        new_db_connection(user_number=user_number, bot_number=bot_number, result=conversations[user_number].get_params(), db_name='cipibot.db')
+
+
+for i in result:
+    add_conversation(i[0],i[1])
+for i in result:
+    conversations[i[0]].put_params(i[2])
+
 whatsapp_web_url = "http://localhost:8000/send" # Replace with your endpoint URL
 nest_asyncio.apply()
 
-def notify_admin(message: str):
-    send_to_phone(ADMIN_NUMBER, BOT_NUMBER, message)
+if sys.version_info < (3, 10):
+    print("Tak bisa jalan di python < 3.10")
+    sys.exit()
 
-def no_process(conv_obj: Conversation, prompt: str) -> str:
-    return prompt
+def notify_admin(message: str):
+    send_to_phone(cfg['CONFIG']['ADMIN_NUMBER'], cfg['CONFIG']['BOT_NUMBER'], message)
+
+def generate_filename():
+    chars = string.ascii_lowercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(10))
  
 def send_to_phone(user_number: str, bot_number: str, message: str) -> None:
     """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
@@ -53,16 +76,12 @@ def reformat_phone(text: str) -> str:
     """Ambil hanya nomor telfon saja, tanpa ending @c.us"""
     return 'user'+ str(text.split("@")[0])
 
-def add_conversation(user_number:str, bot_number: str, message: str) -> None:
-    """create new conversation object"""
-    conversations.update({user_number : Conversation(user_number, bot_number)})
-
 
 def save_log(user_number: str) -> None:
     """cari object di conversations dict lalu save jadi log file"""
     if user_number not in conversations:
         return print(f"Conversation dengan {user_number} tidak ada")
-    dir = CONFIG['logdir']
+    dir = cfg['CONFIG']['LOGDIR']
     filepath = str(user_number) + ".log"
           
     # Create the log directory if it doesn't exist
@@ -93,23 +112,23 @@ async def start_background_tasks():
     tasks = [loop.create_task(start_coroutines())]
     await asyncio.gather(*tasks)
 
+@app.put("/set_bot_name/{user_number}/{bot_name}")
+async def set_bot_name(user_number: str, bot_name: str):
+    if user_number not in conversations:
+        return {'message':'user dont exist'}
+    try:
+        conversations[user_number].set_bot_name(bot_name)
+    except Exception as e:
+        return {'message' : e}
+    return {'message': 'done'}
+
 
 @app.post("/messages")
 async def receive_message(message: Message):
-    """Terima pesan dari WA"""
-    if (message.author != '') and (message.text[0:3].lower() != 'gpt'):
-        return None
+    """Fungsi terpenting menerima pesan dari WA web"""
+    if message.user_number not in conversations:
+        add_conversation(user_number=message.user_number, bot_number=message.bot_number)
     
-    #kalau ada depan gpt. buang.
-    if (message.text[0:3].lower() == 'gpt'):
-        message.text = message.text[3:]
-
-    #buang aja karakter unicode
-    message.text = message.text.encode('ascii', errors='ignore').decode()
-    print("-------------------------------------------------")
-    print("Message:",message)
-    print("-------------------------------------------------")
-
     if message.type == 'chat':
         #response_text = f"You received a message from {message.user_number}: {message.text}"
         if message.user_number not in conversations:
@@ -120,13 +139,16 @@ async def receive_message(message: Message):
 
         try:
             #response_text = process_msg(conversation_obj, message.text)
-            Proc_obj = MsgProcessor(conversation_obj)
-            response_text = Proc_obj.run(message.text)
+            Proc_obj = MsgProcessor(conversation_obj, 'cipibot.db')
+            response_text = Proc_obj.process(message)
+            if response_text == None:
+                return {'data': 'none'}
         except Exception as err:
             print(">>>>>>>>>>>>>>>> ERROR : " + f"{str(err)}<<<<<<<<<<<<<<<<<<<<<")
             notify_admin(f"Ada error {str(err)}nih!")
             return {"message" : return_brb()}
-                
+
+        update_db_connection(user_number=message.user_number, bot_number=message.bot_number, result=conversation_obj.get_params(), db_name='cipibot.db')
         # logging.debug("Returned response: " + str(response_text))
         return {"message": str(response_text)}
     else:
@@ -162,29 +184,35 @@ async def set_content(message_content: MessageContent):
     content = message_content.message
 
     if message_content.user_number not in conversations:
-        add_conversation(message_content.user_number, message_content.bot_number, content)
+        add_conversation(message_content.user_number, message_content.bot_number)
 
-    usr_num = str(conversations[message_content.user_number]) 
     getattr(conversations[message_content.user_number], roles[message_content.role] )(content)
     logging.debug(f"Inject:{message_content.role}:{content} to {message_content.user_number}")
+    return {'message': 'Done'}
 
+@app.put('/create_conv/{user_number}/{bot_number}')
+async def create_conv(user_number: str, bot_number: str):
+    if user_number not in conversations:
+        add_conversation(user_number, bot_number)
+        return {'message': 'done creation'}
+    return {'message': "already exist"}
 
 @app.put('/botquestion/{user_number}')
 async def put_botquestion(user_number: str, botquestion: List[BotQuestion]):
     # Menambahkan data yang diterima ke dalam list
 
     if user_number not in conversations:
-        conv_obj = conversations.update({user_number : Conversation(user_number, BOT_NUMBER)})
+        conv_obj = conversations.update({user_number : Conversation(user_number, cfg['CONFIG']['BOT_NUMBER'])})
 
     conv_obj = conversations[user_number]
     conv_obj.botquestions.extend(botquestion)
     return {'message': 'Data berhasil ditambahkan!'}
 
-@app.get('/convmode/{user_number}/{convmode}')
-async def convmode(user_number: str, convmode: ConvMode):
+@app.put('/set_mode/{user_number}/{convmode}')
+async def set_mode(user_number: str, convmode: ConvMode):
     if user_number not in conversations: 
         return {'detail' : 'user dont exist'}
-    conversations[user_number].mode = convmode
+    conversations[user_number].set_mode(convmode)
     return {'detail' : f'set to {convmode}'}
 
 @app.get('/botq/{user_number}')
@@ -200,7 +228,7 @@ async def run_question(user_number: str, id: int = 1):
     if user_number not in conversations:
         return {'message' : 'user not exist'}
     conv = conversations[user_number]
-    send_to_phone(user_number, BOT_NUMBER, conv.botquestions[id].question)
+    send_to_phone(user_number, cfg['CONFIG']['BOT_NUMBER'], conv.botquestions[id].question)
     return {'message' : 'done'}
 
 @app.get('/start_question/{user_number}')
@@ -209,28 +237,35 @@ async def start_question(user_number: str):
         return {'message' : 'user not exist'}
     conv = conversations[user_number]
     conv.mode = ConvMode.ASK
-    send_to_phone(user_number, BOT_NUMBER, conv.intro_msg)
-    send_to_phone(user_number, BOT_NUMBER, conv.botquestions[0].question)
+    send_to_phone(user_number, cfg['CONFIG']['BOT_NUMBER'], conv.intro_msg)
+    send_to_phone(user_number, cfg['CONFIG']['BOT_NUMBER'], conv.botquestions[0].question)
+    conv.question_asked = conv.botquestions[0].question
     return {'message' : 'done'}
-
 
 
 @app.get('/set_script/{user_number}/{script}')
 async def set_script(user_number: str, script: Script):
+    """Merubah macam-macam script mukakmu lah."""
     if user_number not in conversations:
         {'detail' : 'user dont exist'}
     print(script)
     conversations[user_number].set_script(script)
     return {'message' : f"set to {script}"}
 
+@app.get('/reset_botquestions/{user_number}')
+async def reset_botquestion(user_number: str):
+    if user_number not in conversations:
+        {'detail' : 'user dont exist'}
+    conversations[user_number].reset_botquestions()
+    return {'message' : 'reset done'}
+
 
 # Endpoint untuk merubah interval pada objek tertentu
-@app.put("/interval/{user_number}/{interval}")
+@app.put("/set_interval/{user_number}/{interval}")
 async def change_interval(user_number: str, interval: int):
     if user_number not in conversations:
         return {"message" : "user does not exist"}
-    obj = conversations[user_number]
-    obj.interval = interval
+    conversations[user_number].set_interval(interval)
     return {"message": f"sudah di set menjadi {interval}"}
 
 
@@ -252,37 +287,53 @@ async def botquestions(user_number: str):
         result = result + f"{item.question}:{item.answer}\n"
     return {'message' : result}
 
+@app.put("/set_persona/{user_number}/{persona}")
+async def set_persona(user_number: str, persona: Persona):
+    if user_number not in conversations:
+        return {'message': 'user not found'}
+    
+    conversations[user_number].set_persona(persona)
+    return {'message' : f'set to {persona}'}
+
+
 @app.get("/obj_info/{user_number}")
 async def obj_info(user_number: str):
     """Return the object in all conversation"""
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
     conv = conversations[user_number]
-    result = { 'botquestions' : conv.botquestions, 
+    result = {'messages' : conv.messages, 
+              'botquestions' : conv.botquestions, 
+              'question_asked' : conv.question_asked,
               'interval' : conv.interval,
               'mode' : conv.mode,
               'wait_time' : conv.wait_time,
-              'max_token' : conv.MAX_TOKEN,
+              'max_token' : cfg['CONFIG']['MAX_TOKEN'],
               'word_limit' : conv.WORD_LIMIT,
               'temperature' : conv.temperature,
              }
     return {'message' : result}
 
 @app.put("/set_interview/{user_number}")
-async def set_interview(user_number: str, intro: str, outro: str):
+async def set_interview(user_number: str, data: dict):
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
-    conversations[user_number].intro_msg = intro
-    conversations[user_number].outro_msg = outro
+    conversations[user_number].set_intro_msg(data['intro_msg'])
+    conversations[user_number].set_outro_msg(data['outro_msg'])
     return {'mesage' : 'done set intro and outro'}
+
+@app.get('/test_send/{user_number}')
+async def test_send(user_number: str):
+    if user_number not in conversations:
+        return {'message' : 'user does not exist'}
+    response = await conversations[user_number].send_msg("Hello")
+    return {'message' : response}
 
 @app.get("/ping")
 async def ping():
     return {"message" : "pong"}
 
-
-start_background_tasks()
-
+#start_background_tasks()
 
 if __name__ == "__main__":
     import uvicorn

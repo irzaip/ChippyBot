@@ -114,6 +114,7 @@ app.post('/send', async (req, res) => {
     const chat = await client.getChatById(to);
     chat.sendMessage(message);
     res.send('Message sent');
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   SEND MESSAGE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
   } catch (error) {
     console.error(error);
     res.status(500).send('Error sending message');

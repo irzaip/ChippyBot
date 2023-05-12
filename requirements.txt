@@ -6,4 +6,5 @@ jupyter notebook
 nest_asyncio
 nltk
 openai
+huggingface_hub
 
