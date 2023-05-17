@@ -164,3 +164,13 @@ def save_conversation():
     else:
         print(f'Error Saving conversations')
 
+
+def get_conversations() -> list:
+    url = f'{server_address}/list_conversations'
+    response = requests.get(url)
+    if response.ok:
+        return response.text # type: ignore
+    else:
+        raise ValueError
+
+   

@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from enum import Enum, auto
-from rivescript import RiveScript
+from rivescript import RiveScript # type: ignore
 from dataclasses import dataclass
 import toml
 import requests
 import asyncio
 import json
-
+from typing import Literal
 
 cfg = toml.load('config.toml')
 
@@ -27,6 +27,7 @@ class Persona(str, Enum):
     CONTENT_CREATOR = auto()
     PSYCHOLOG = auto()
     ROLEPLAY = auto()
+    KOBOLD = auto()
     
 
 class Role(str, Enum):
@@ -69,7 +70,7 @@ class Message(BaseModel):
     hasMedia: bool = False
     message: dict = {}
 
-    def toJSON(self):
+    def toJSON(self) -> str:
         return json.dumps(self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)
     
@@ -89,7 +90,7 @@ class MessageContent(BaseModel):
 
 class Conversation():
     """create conversation object unique to user"""
-    def __init__(self, user_number, bot_number):
+    def __init__(self, user_number: str, bot_number: str) -> None:
         if not bot_number:
             bot_number = "6285775300227@c.us"
         self.bot_name = "Maya"
@@ -111,6 +112,8 @@ class Conversation():
         self.need_group_prefix = True
         self.last_question = 0
         self.question_asked = ""
+        self.user_name = ""
+        self.user_fullinfo = {}
         self.add_system("Kamu adalah Maya, Assisten yang baik. Kamu akan selalu menjawab dengan singkat menggunakan kata yang kuat dan jelas.")
         self.add_role_user("Kamu akan menjadi teman dalam chat, nama kamu Maya, dan pembuat kamu adalah Irza Pulungan, dia seorang programmer yang baik dan berbudi, kamu menjawab dengan singkat dengan gaya bahasa Raditya Dika. Saya akan mulai dengan menyapa kamu setelah ini. HALO")
         self.add_role_assistant("Halo, nama saya Maya, ada yang bisa saya bantu?")
@@ -153,19 +156,19 @@ class Conversation():
         reply = self.rivebot.reply("localuser", message)
         return reply
 
-    def add_system(self, message) -> None:
+    def add_system(self, message: str) -> None:
         self.messages.append({"role" : "system", "content": message})
 
-    def change_system(self, message) -> None:
+    def change_system(self, message: str) -> None:
         self.messages[0]['content'] = message
     
     def reset_system(self) -> None:
         self.messages = []
         
-    def add_role_user(self, message) -> None:
+    def add_role_user(self, message: str) -> None:
         self.messages.append({"role": "user", "content" : message})
         
-    def add_role_assistant(self, message) -> None:
+    def add_role_assistant(self, message: str) -> None:
         self.messages.append({"role" : "assistant", "content" : message})
      
     def get_user_number(self) -> str:
@@ -212,13 +215,13 @@ class Conversation():
                 break
         return (len(self.botquestions),len(self.botquestions))
 
-    async def send_msg(self, message: str):
+    async def send_msg(self, message: str) -> Literal['Done']:
         """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
         message = {
             "message": message, # Replace with your message text
             "from": self.bot_number, # Replace with the sender number
             "to": self.user_number, # Replace with out bot number
-        }
+        } # type: ignore
 
         print(message)
         response = requests.post(whatsapp_web_url, json=message)
@@ -253,6 +256,8 @@ class Conversation():
             'question_asked' : self.question_asked,
             'temperature' : self.temperature,
             'wait_time' : self.wait_time,
+            'user_name' : self.user_name,
+            'user_fullinfo' : self.user_fullinfo,
         }
         return json.dumps(obj)
 
@@ -270,9 +275,11 @@ class Conversation():
         self.question_asked = obj['question_asked']
         self.temperature = obj['temperature']
         self.wait_time = obj['wait_time']
+        self.user_name = obj['user_name']
+        self.user_fullinfo = obj['user_fullinfo']
         return "Done"
     
-    def set_lisa_hrd(self):
+    def set_lisa_hrd(self) -> None:
         self.last_question = 0
         self.botquestions = []
         self.persona = Persona.HRD
@@ -288,5 +295,6 @@ class BotQuestion():
     multiplier: int = 1
     score: int = 1
     comment: str = ""
+
 
 

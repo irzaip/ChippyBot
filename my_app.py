@@ -3,8 +3,13 @@ from conversations import Persona, Script, BotQuestion, Role, ConvMode
 import pprint
 
 bot_name = "Lisa"
-um = "62895352277562@c.us"
-un = "120363149813038443@g.us"
+irza = "62895352277562@c.us"
+mlt = "6287760368781@c.us"
+tm = "62895391400811@c.us"
+grp = "120363149813038443@g.us"
+
+
+un = mlt
 bt = "6285775300227@c.us"
 sysmsg = "Kamu asisten yang buruk"
 pertanyaan = {
@@ -19,7 +24,7 @@ cm = ConvMode.ASK
 sc = Script.BRAIN
 
 
-cp.set_bot_name(un, "Lisa")
+cp.set_bot_name(un, "mgm")
 
 #cp.create_conv(un, bt )
 #cp.test_send(un)
@@ -52,6 +57,10 @@ telah mengisi semua jawabannya.
 Terima kasih.
 """
 #cp.getmode(un)
+result = cp.obj_info(un)
+import pickle
+with open('result.pickle', 'wb') as file:
+    pickle.dump(result, file)
 
 #cp.run_question(un, 0)
 
@@ -64,7 +73,7 @@ cp.set_message(un, m_s, Role.SYSTEM)
 cp.set_message(un, m_u, Role.USER)
 cp.set_message(un, m_a, Role.ASSISTANT)
 
-cp.set_convmode(un, cm)
+cp.set_mode(un, cm)
 
 cp.set_interval(un, 3000)
 

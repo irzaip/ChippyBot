@@ -1,10 +1,5 @@
 import sqlite3
-
-
-
-from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
-
+from typing import Literal
 
 SQLITE = 'sqlite'
 
@@ -12,24 +7,7 @@ CONNECTION = 'connection'
 CONVERSATIONS = 'conversations'
 
 
-class MyDatabase:
-    # http://docs.sqlalchemy.org/en/latest/core/engines.html
-    DB_ENGINE = {
-        SQLITE: 'sqlite:///{DB}'
-    }
 
-    # Main DB Connection Ref Obj
-    db_engine = None
-    def __init__(self, dbtype, username='', password='', dbname=''):
-        dbtype = dbtype.lower()
-        if dbtype in self.DB_ENGINE.keys():
-            engine_url = self.DB_ENGINE[dbtype].format(DB=dbname)
-            self.db_engine = create_engine(engine_url)
-            print(self.db_engine)
-        else:
-            print("DBType is not found in DB_ENGINE")
-
-print("DBType is not found in DB_ENGINE")
 
 #db = MyDatabase(SQLITE,username='', password='', dbname='cipibot.db')
 
@@ -62,7 +40,7 @@ def get_db_all_connection(db_name: str):
     return result
 
 
-def new_db_connection(user_number: str, bot_number: str, result: str, db_name: str):
+def new_db_connection(user_number: str, bot_number: str, result: str, db_name: str) -> Literal['new entry created!']:
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO CONNECTION (user_number, bot_number, value) VALUES (?,?,?)", (user_number, bot_number, result))
@@ -71,7 +49,7 @@ def new_db_connection(user_number: str, bot_number: str, result: str, db_name: s
     conn.close()
     return "new entry created!"
 
-def update_db_connection(user_number: str, bot_number: str, result: str, db_name: str):
+def update_db_connection(user_number: str, bot_number: str, result: str, db_name: str) -> Literal['new entry created!']:
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("UPDATE CONNECTION SET VALUE = ? WHERE user_number = ? AND bot_number = ?", (result, user_number, bot_number ))
@@ -80,14 +58,13 @@ def update_db_connection(user_number: str, bot_number: str, result: str, db_name
     conn.close()
     return "new entry created!"
 
-def del_db_connection(user_number: str, bot_number: str, db_name: str):
+def del_db_connection(user_number: str, bot_number: str, db_name: str) -> Literal['data deleted!']:
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM CONNECTION WHERE user_number=?', (user_number) )
-    cursor.commit()
+    cursor.commit() # type: ignore
     cursor.close()
     conn.close()
     return "data deleted!"
 
 
-result = get_db_all_connection('cipibot.db')

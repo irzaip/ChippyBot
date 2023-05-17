@@ -3,11 +3,9 @@ from conversations import Message, BotQuestion, ConvMode, Script
 from conversations import MessageContent, Conversation, Persona
 from Msgproc import MsgProcessor
 import requests, os, random, sys
-from typing import List
+from typing import List, Union
 import asyncio
 import nest_asyncio
-import json
-import pprint
 import random, string
 import logging
 from db_oper import new_db_connection, update_db_connection, get_db_all_connection, get_db_connection
@@ -48,10 +46,10 @@ if sys.version_info < (3, 10):
     print("Tak bisa jalan di python < 3.10")
     sys.exit()
 
-def notify_admin(message: str):
+def notify_admin(message: str) -> None:
     send_to_phone(cfg['CONFIG']['ADMIN_NUMBER'], cfg['CONFIG']['BOT_NUMBER'], message)
 
-def generate_filename():
+def generate_filename() -> str:
     chars = string.ascii_lowercase + string.digits
     return ''.join(random.choice(chars) for _ in range(10))
  
@@ -61,7 +59,7 @@ def send_to_phone(user_number: str, bot_number: str, message: str) -> None:
         "message": message, # Replace with your message text
         "from": bot_number, # Replace with the sender number
         "to": user_number # Replace with out bot number
-    }
+    } # type: ignore
 
     response = requests.post(whatsapp_web_url, json=message)
 
@@ -102,18 +100,18 @@ def return_brb() -> str:
     return message
 
 # Fungsi untuk memulai menjalankan setiap coroutine pada setiap objek
-async def start_coroutines():
+async def start_coroutines() -> None:
     coroutines = [obj.start_coroutine() for obj in conversations.values()]
     await asyncio.gather(*coroutines)
 
 # Jalankan coroutines di background menggunakan event loop
-async def start_background_tasks():
+async def start_background_tasks() -> None:
     loop = asyncio.get_running_loop()
     tasks = [loop.create_task(start_coroutines())]
     await asyncio.gather(*tasks)
 
 @app.put("/set_bot_name/{user_number}/{bot_name}")
-async def set_bot_name(user_number: str, bot_name: str):
+async def set_bot_name(user_number: str, bot_name: str) -> Union[dict, dict, None]:
     if user_number not in conversations:
         return {'message':'user dont exist'}
     try:
@@ -124,7 +122,7 @@ async def set_bot_name(user_number: str, bot_name: str):
 
 
 @app.post("/messages")
-async def receive_message(message: Message):
+async def receive_message(message: Message) -> dict[str, str] | str:
     """Fungsi terpenting menerima pesan dari WA web"""
     if message.user_number not in conversations:
         add_conversation(user_number=message.user_number, bot_number=message.bot_number)
@@ -136,6 +134,8 @@ async def receive_message(message: Message):
 
         #pass conversation object to process
         conversation_obj = conversations[message.user_number]
+        if message.notifyName:
+            conversation_obj.user_name = message.notifyName
 
         try:
             #response_text = process_msg(conversation_obj, message.text)
@@ -156,15 +156,15 @@ async def receive_message(message: Message):
         return return_brb()
 
 @app.get("/print_messages/{user_number}")
-async def print_messages(user_number: str) -> str:
+async def print_messages(user_number: str) -> str: # type: ignore
     """Keluarkan log percakapan dengan nomor tertentu"""
     if user_number in conversations:
-        return {"messages" : str(conversations[user_number].messages)}
+        return {"messages" : str(conversations[user_number].messages)} # type: ignore
     else:
         logging.error(f"save_log error finding user_number: {str(user_number)}")
 
 @app.get("/save_logs")
-async def save_logs():
+async def save_logs() -> dict[str, str] | None:
     """save semua logs conversation ke dalam file log"""
     for i in conversations.keys():
         try:
@@ -174,7 +174,7 @@ async def save_logs():
             logging.error("Error saving logs")
 
 @app.post("/set_content")
-async def set_content(message_content: MessageContent):
+async def set_content(message_content: MessageContent) -> dict[str, str]:
     "Inject conversation ke dalam object Conversation"
     roles = {
         'SYSTEM': 'reset_system',
@@ -191,14 +191,14 @@ async def set_content(message_content: MessageContent):
     return {'message': 'Done'}
 
 @app.put('/create_conv/{user_number}/{bot_number}')
-async def create_conv(user_number: str, bot_number: str):
+async def create_conv(user_number: str, bot_number: str) -> dict[str, str]:
     if user_number not in conversations:
         add_conversation(user_number, bot_number)
         return {'message': 'done creation'}
     return {'message': "already exist"}
 
 @app.put('/botquestion/{user_number}')
-async def put_botquestion(user_number: str, botquestion: List[BotQuestion]):
+async def put_botquestion(user_number: str, botquestion: List[BotQuestion]) -> dict[str, str]:
     # Menambahkan data yang diterima ke dalam list
 
     if user_number not in conversations:
@@ -209,22 +209,22 @@ async def put_botquestion(user_number: str, botquestion: List[BotQuestion]):
     return {'message': 'Data berhasil ditambahkan!'}
 
 @app.put('/set_mode/{user_number}/{convmode}')
-async def set_mode(user_number: str, convmode: ConvMode):
+async def set_mode(user_number: str, convmode: ConvMode) -> dict[str, str]:
     if user_number not in conversations: 
         return {'detail' : 'user dont exist'}
     conversations[user_number].set_mode(convmode)
     return {'detail' : f'set to {convmode}'}
 
 @app.get('/botq/{user_number}')
-async def get_botq(user_number: str):    
+async def get_botq(user_number: str) -> dict[str, str]:    
     return {'message': str(conversations[user_number].botquestions) }
 
 @app.get('/getmode/{user_number}')
-async def getmode(user_number: str):    
+async def getmode(user_number: str) -> dict[str, str]:    
     return {'message': str(conversations[user_number].mode) }
 
 @app.get('/run_question/{user_number}/{id}')
-async def run_question(user_number: str, id: int = 1):
+async def run_question(user_number: str, id: int = 1) -> dict[str, str]:
     if user_number not in conversations:
         return {'message' : 'user not exist'}
     conv = conversations[user_number]
@@ -232,7 +232,7 @@ async def run_question(user_number: str, id: int = 1):
     return {'message' : 'done'}
 
 @app.get('/start_question/{user_number}')
-async def start_question(user_number: str):
+async def start_question(user_number: str) -> dict[str, str]:
     if user_number not in conversations:
         return {'message' : 'user not exist'}
     conv = conversations[user_number]
@@ -244,25 +244,24 @@ async def start_question(user_number: str):
 
 
 @app.get('/set_script/{user_number}/{script}')
-async def set_script(user_number: str, script: Script):
+async def set_script(user_number: str, script: Script) -> dict[str, str]:
     """Merubah macam-macam script mukakmu lah."""
     if user_number not in conversations:
-        {'detail' : 'user dont exist'}
-    print(script)
+        return {'detail' : 'user dont exist'}
     conversations[user_number].set_script(script)
     return {'message' : f"set to {script}"}
 
 @app.get('/reset_botquestions/{user_number}')
-async def reset_botquestion(user_number: str):
+async def reset_botquestion(user_number: str) -> dict[str, str]:
     if user_number not in conversations:
-        {'detail' : 'user dont exist'}
+        return {'detail' : 'user dont exist'}
     conversations[user_number].reset_botquestions()
     return {'message' : 'reset done'}
 
 
 # Endpoint untuk merubah interval pada objek tertentu
 @app.put("/set_interval/{user_number}/{interval}")
-async def change_interval(user_number: str, interval: int):
+async def change_interval(user_number: str, interval: int) -> dict[str, str]:
     if user_number not in conversations:
         return {"message" : "user does not exist"}
     conversations[user_number].set_interval(interval)
@@ -271,13 +270,13 @@ async def change_interval(user_number: str, interval: int):
 
 # Endpoint untuk memulai menjalankan method pada setiap objek
 @app.get("/call_method")
-async def start_method_call():
+async def start_method_call() -> dict[str, str]:
     await start_background_tasks()
     return {"message": "Method dijalankan pada setiap objek."}
 
 
 @app.get("/botquestions/{user_number}")
-async def botquestions(user_number: str):
+async def botquestions(user_number: str) -> dict[str, str]:
     """check seluruh tanya-jawab di object conversation milik user"""
     if user_number not in conversations:
         return {'message' : 'user not found'}
@@ -288,7 +287,7 @@ async def botquestions(user_number: str):
     return {'message' : result}
 
 @app.put("/set_persona/{user_number}/{persona}")
-async def set_persona(user_number: str, persona: Persona):
+async def set_persona(user_number: str, persona: Persona) -> dict[str, str]:
     if user_number not in conversations:
         return {'message': 'user not found'}
     
@@ -297,7 +296,7 @@ async def set_persona(user_number: str, persona: Persona):
 
 
 @app.get("/obj_info/{user_number}")
-async def obj_info(user_number: str):
+async def obj_info(user_number: str) -> Union[dict, dict, None]:
     """Return the object in all conversation"""
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
@@ -315,7 +314,7 @@ async def obj_info(user_number: str):
     return {'message' : result}
 
 @app.put("/set_interview/{user_number}")
-async def set_interview(user_number: str, data: dict):
+async def set_interview(user_number: str, data: dict) -> dict[str, str]:
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
     conversations[user_number].set_intro_msg(data['intro_msg'])
@@ -323,16 +322,32 @@ async def set_interview(user_number: str, data: dict):
     return {'mesage' : 'done set intro and outro'}
 
 @app.get('/test_send/{user_number}')
-async def test_send(user_number: str):
+async def test_send(user_number: str)-> dict:
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
     response = await conversations[user_number].send_msg("Hello")
-    return {'message' : response}
+    if response.ok:
+        return {'message' : response.text}
+    else:
+        return {'message' : 'error sending test'}
 
 @app.get("/ping")
-async def ping():
+async def ping() -> dict[str, str]:
     return {"message" : "pong"}
 
+@app.get("/list_conversations")
+async def list_conversations() -> dict:
+    list_conv = []
+    all_conv = list(conversations.keys())
+    print(all_conv)
+    for i in all_conv:
+        item = f"{conversations[i].user_number}###{conversations[i].user_name}" 
+        list_conv.append(item)
+        
+    return {'message' : list_conv}
+
+    
+    
 #start_background_tasks()
 
 if __name__ == "__main__":
