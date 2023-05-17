@@ -23,9 +23,10 @@ client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
 
-client.on('ready', () => {
-    console.log('Client is ready!');
+client.on('ready', async() => {
+  console.log('Client is ready!');
 });
+
 
 async function convertOggToWav(oggPath, wavPath) {
   return new Promise((resolve, reject) => {
@@ -38,7 +39,6 @@ async function convertOggToWav(oggPath, wavPath) {
       .run();
   });
 }
-
 
 
 client.on('message', async (msg) => {
@@ -118,6 +118,39 @@ app.post('/send', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Error sending message');
+  }
+});
+
+app.get('/participant', async (req, res) => {
+  try {
+    const chats = await client.getChats();
+    const groups = chats.filter(chat => chat.isGroup && chat.name);
+    let data = [];
+
+    for (const g of groups) {
+      let groupData = {
+        group_id: g.id._serialized,
+        group_name: g.name,
+        participants: []
+      };
+
+      for (const p of g.participants) {
+        let c = await client.getContactById(p.id._serialized);
+        let name = c.name || c.pushname;
+        name = name ? name + " [" + c.number + "]" : c.number;
+
+        groupData.participants.push({
+          name: name,
+          contact_id: p.id._serialized
+        });
+      }
+      data.push(groupData);
+    }
+    let jsonString = JSON.stringify(data);
+    res.send(jsonString);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error getting participant')
   }
 });
   
