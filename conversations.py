@@ -207,6 +207,14 @@ class Conversation():
     def set_question_asked(self, question_asked: str) -> None:
         self.question_asked = question_asked
 
+    def set_personality(self, bot_name: str, conf_section: str, reply_with: str) -> str:
+        self.reset_system()
+        self.set_bot_name(bot_name)
+        self.add_system(cfg[conf_section]['M_S'])
+        self.add_role_user(cfg[conf_section]['M_U'])
+        self.add_role_assistant(cfg[conf_section]['M_A'])  
+        return reply_with
+
     def get_last_question(self) -> tuple:
         for i, item in enumerate(self.botquestions):
             if not item.answer:
@@ -215,7 +223,7 @@ class Conversation():
                 break
         return (len(self.botquestions),len(self.botquestions))
 
-    async def send_msg(self, message: str) -> Literal['Done']:
+    def send_msg(self, message: str) -> Literal['Done']:
         """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
         message = {
             "message": message, # Replace with your message text
@@ -233,9 +241,13 @@ class Conversation():
             print(response.text)
         return "Done"
 
+    async def send_async_msg(self, message: str):
+        return await asyncio.to_thread(self.send_msg, message)
+
     async def timedcall(self) -> None:
+        task = asyncio.create_task(self.send_async_msg(f"Method interval {self.interval} pada objek dengan nama: {self.user_number}"))
         print("Method dipanggil pada objek dengan nama:", self.user_number)
-        await self.send_msg("Method timer")
+        #await self.send_msg("Method timer")
 
     async def start_coroutine(self) -> None:
         while True:

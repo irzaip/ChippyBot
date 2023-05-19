@@ -4,16 +4,21 @@ from conversations import MessageContent, Conversation, Persona
 from Msgproc import MsgProcessor
 import requests, os, random, sys
 from typing import List, Union
-import asyncio
+import asyncio, aiohttp
 import nest_asyncio
 import random, string
 import logging
 from db_oper import new_db_connection, update_db_connection, get_db_all_connection, get_db_connection
 import toml
+from queue import Queue
+from datetime import datetime
+import uvicorn
 
 cfg = toml.load('config.toml')
 
 CONFIG = {}
+#queue = Queue()
+msgprocess = MsgProcessor(db_file='cipibot.db')
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -47,7 +52,7 @@ if sys.version_info < (3, 10):
     sys.exit()
 
 def notify_admin(message: str) -> None:
-    send_to_phone(cfg['CONFIG']['ADMIN_NUMBER'], cfg['CONFIG']['BOT_NUMBER'], message)
+    send_to_phone(cfg['CONFIG']['ADMIN_NUMBER'][0], cfg['CONFIG']['BOT_NUMBER'], message)
 
 def generate_filename() -> str:
     chars = string.ascii_lowercase + string.digits
@@ -139,13 +144,12 @@ async def receive_message(message: Message) -> dict[str, str] | str:
 
         try:
             #response_text = process_msg(conversation_obj, message.text)
-            Proc_obj = MsgProcessor(conversation_obj, 'cipibot.db')
-            response_text = Proc_obj.process(message)
+            response_text = await msgprocess.process(conversation_obj, message=message)
             if response_text == None:
                 return {'data': 'none'}
         except Exception as err:
             print(">>>>>>>>>>>>>>>> ERROR : " + f"{str(err)}<<<<<<<<<<<<<<<<<<<<<")
-            notify_admin(f"Ada error {str(err)}nih!")
+            asyncio.to_thread(notify_admin(f"Ada error {str(err)}nih!")) # type: ignore
             return {"message" : return_brb()}
 
         update_db_connection(user_number=message.user_number, bot_number=message.bot_number, result=conversation_obj.get_params(), db_name='cipibot.db')
@@ -300,17 +304,7 @@ async def obj_info(user_number: str) -> Union[dict, dict, None]:
     """Return the object in all conversation"""
     if user_number not in conversations:
         return {'message' : 'user does not exist'}
-    conv = conversations[user_number]
-    result = {'messages' : conv.messages, 
-              'botquestions' : conv.botquestions, 
-              'question_asked' : conv.question_asked,
-              'interval' : conv.interval,
-              'mode' : conv.mode,
-              'wait_time' : conv.wait_time,
-              'max_token' : cfg['CONFIG']['MAX_TOKEN'],
-              'word_limit' : conv.WORD_LIMIT,
-              'temperature' : conv.temperature,
-             }
+    result = conversations[user_number].get_params()
     return {'message' : result}
 
 @app.put("/set_interview/{user_number}")
@@ -342,15 +336,44 @@ async def list_conversations() -> dict:
     print(all_conv)
     for i in all_conv:
         item = f"{conversations[i].user_number}###{conversations[i].user_name}" 
-        list_conv.append(item)
-        
+        list_conv.append(item)        
     return {'message' : list_conv}
 
-    
-    
-#start_background_tasks()
+
+@app.get("/run_background_task/{user_number}")
+async def run_background_task(user_number: str):
+    if user_number not in conversations:
+        return {'message': 'user not found'}
+    asyncio.create_task(conversations[user_number].start_coroutine())
+    return {'message': 'started'}
+
+async def background_task():
+    count = 0
+    while True:
+        count += 1
+        print("ping", count)
+        await asyncio.sleep(10)
+
+async def background_task2():
+    count = 0
+    while True:
+        count += 1
+        print("pong", count)
+        await asyncio.sleep(9)
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(background_task())
+    asyncio.create_task(background_task2())
+    #asyncio.create_task(conversations[cfg['CONFIG']['ADMIN_NUMBER'][0]].start_coroutine())
+    asyncio.create_task(msgprocess.process_queue())
+
+# @app.on_event("shutdown")
+# async def shutdown_event():
+#     asyncio.current_task
 
 if __name__ == "__main__":
-    import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8998)
 

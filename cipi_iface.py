@@ -173,4 +173,10 @@ def get_conversations() -> list:
     else:
         raise ValueError
 
-   
+def run_background_task(user_number) -> None:
+    url = f'{server_address}/run_background_task/{user_number}'
+    response = requests.get(url)
+    if response.ok:
+        print(response.text)
+    else:
+        print(f'Error running background task')

@@ -1,15 +1,16 @@
 import cipi_iface as cp
 from conversations import Persona, Script, BotQuestion, Role, ConvMode
 import pprint
+import json
 
-bot_name = "Lisa"
+bot_name = "Maya"
 irza = "62895352277562@c.us"
 mlt = "6287760368781@c.us"
 tm = "62895391400811@c.us"
 grp = "120363149813038443@g.us"
 
 
-un = mlt
+un = grp
 bt = "6285775300227@c.us"
 sysmsg = "Kamu asisten yang buruk"
 pertanyaan = {
@@ -19,12 +20,17 @@ pertanyaan = {
     3: "Pertanyaan 4",
 }
 
+
 p = Persona.ASSISTANT
 cm = ConvMode.ASK
 sc = Script.BRAIN
 
 
-cp.set_bot_name(un, "mgm")
+cp.set_interval(un, 6000)
+cp.run_background_task(un)
+pprint.pprint(json.loads(cp.obj_info(un)['message']))
+
+#cp.set_bot_name(un, "Maya")
 
 #cp.create_conv(un, bt )
 #cp.test_send(un)
