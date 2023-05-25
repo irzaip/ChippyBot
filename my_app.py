@@ -10,7 +10,7 @@ tm = "62895391400811@c.us"
 grp = "120363149813038443@g.us"
 
 
-un = grp
+un = irza
 bt = "6285775300227@c.us"
 sysmsg = "Kamu asisten yang buruk"
 pertanyaan = {
@@ -27,7 +27,7 @@ sc = Script.BRAIN
 
 
 cp.set_interval(un, 6000)
-cp.run_background_task(un)
+#cp.run_background_task(un)
 pprint.pprint(json.loads(cp.obj_info(un)['message']))
 
 #cp.set_bot_name(un, "Maya")

@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from conversations import Message, BotQuestion, ConvMode, Script
+from conversations import Message, BotQuestion, ConvMode, Script, ConvType
 from conversations import MessageContent, Conversation, Persona
 from Msgproc import MsgProcessor
 import requests, os, random, sys
 from typing import List, Union
-import asyncio, aiohttp
+import asyncio
 import nest_asyncio
 import random, string
 import logging
@@ -13,7 +13,11 @@ import toml
 from queue import Queue
 from datetime import datetime
 import uvicorn
+from colorama import just_fix_windows_console, Fore, Back, Style
+import subprocess
 
+
+just_fix_windows_console()
 cfg = toml.load('config.toml')
 
 CONFIG = {}
@@ -42,7 +46,10 @@ def add_conversation(user_number:str, bot_number: str) -> None:
 for i in result:
     add_conversation(i[0],i[1])
 for i in result:
-    conversations[i[0]].put_params(i[2])
+    try:
+        conversations[i[0]].put_params(i[2])
+    except:
+        print(f"{Style.BRIGHT}error restoring conv no: {i[0]}{Style.RESET_ALL}")
 
 whatsapp_web_url = "http://localhost:8000/send" # Replace with your endpoint URL
 nest_asyncio.apply()
@@ -148,8 +155,8 @@ async def receive_message(message: Message) -> dict[str, str] | str:
             if response_text == None:
                 return {'data': 'none'}
         except Exception as err:
-            print(">>>>>>>>>>>>>>>> ERROR : " + f"{str(err)}<<<<<<<<<<<<<<<<<<<<<")
-            asyncio.to_thread(notify_admin(f"Ada error {str(err)}nih!")) # type: ignore
+            print(f"{Fore.RED}{Back.WHITE}>>>>>>>>>>>>>>>> ERROR : " + f"{str(err)} <<<<<<<<<<<<<<<<<<<<<{Fore.WHITE}{Back.BLACK}")
+            await asyncio.to_thread(notify_admin(f"Ada error {str(err)} nih!")) # type: ignore
             return {"message" : return_brb()}
 
         update_db_connection(user_number=message.user_number, bot_number=message.bot_number, result=conversation_obj.get_params(), db_name='cipibot.db')
@@ -181,7 +188,7 @@ async def save_logs() -> dict[str, str] | None:
 async def set_content(message_content: MessageContent) -> dict[str, str]:
     "Inject conversation ke dalam object Conversation"
     roles = {
-        'SYSTEM': 'reset_system',
+        'SYSTEM': 'add_system',
         'USER': 'add_role_user',
         'ASSISTANT': 'add_role_assistant'
     }
@@ -212,7 +219,7 @@ async def put_botquestion(user_number: str, botquestion: List[BotQuestion]) -> d
     conv_obj.botquestions.extend(botquestion)
     return {'message': 'Data berhasil ditambahkan!'}
 
-@app.put('/set_mode/{user_number}/{convmode}')
+@app.put('/set_convmode/{user_number}/{convmode}')
 async def set_mode(user_number: str, convmode: ConvMode) -> dict[str, str]:
     if user_number not in conversations: 
         return {'detail' : 'user dont exist'}
@@ -262,6 +269,14 @@ async def reset_botquestion(user_number: str) -> dict[str, str]:
     conversations[user_number].reset_botquestions()
     return {'message' : 'reset done'}
 
+@app.get('/reset_channel/{user_number}')
+async def reset_channel(user_number: str) -> dict[str, str]:
+    if user_number not in conversations:
+        return {'detail' : 'user dont exist'}
+    conversations[user_number].set_persona(Persona.ASSISTANT)
+    conversations[user_number].set_personality("Maya", "AST", "Hai, Aku Maya, aku akan berusaha membantumu")
+    return {'message' : 'reset done'}
+
 
 # Endpoint untuk merubah interval pada objek tertentu
 @app.put("/set_interval/{user_number}/{interval}")
@@ -271,6 +286,19 @@ async def change_interval(user_number: str, interval: int) -> dict[str, str]:
     conversations[user_number].set_interval(interval)
     return {"message": f"sudah di set menjadi {interval}"}
 
+@app.put("/tambah_free_tries/{user_number}/{unit}")
+async def tambah_free_tries(user_number: str, unit: int):
+    if user_number not in conversations:
+        return {'message': 'user does not exist'}
+    conversations[user_number].tambah_free_tries(unit)
+    return {"message": f"user {user_number} sudah di tambah {unit} free tries"}
+
+@app.put("/tambah_paid_messages/{user_number}/{unit}")
+async def tambah_paid_messages(user_number: str, unit: int):
+    if user_number not in conversations:
+        return {'message': 'user does not exist'}
+    conversations[user_number].tambah_paid_messages(unit)
+    return {"message": f"user {user_number} sudah di tambah {unit} paid messages"}
 
 # Endpoint untuk memulai menjalankan method pada setiap objek
 @app.get("/call_method")
@@ -347,6 +375,30 @@ async def run_background_task(user_number: str):
     asyncio.create_task(conversations[user_number].start_coroutine())
     return {'message': 'started'}
 
+@app.get("/set_maintenance")
+async def set_maintenance() -> dict:
+    if msgprocess.on_maintenance:
+        msgprocess.on_maintenance = False
+        print(f"{Fore.RED}{Back.WHITE}MAINTENANCE FINISHED NOW!! - BACK TO NORMAL{Fore.WHITE}{Back.BLACK}")
+    else:
+        msgprocess.on_maintenance = True
+        print(f"{Fore.RED}{Back.WHITE}GO TO MAINTENANCE MODE NOW!!{Fore.WHITE}{Back.BLACK}")
+    return {'message': 'Done setting'}
+
+@app.get('/rebuild_connection_db')
+async def rebuild_connection_db():
+    for i in conversations.keys():
+        update_db_connection(conversations[i].user_number, conversations[i].bot_number, conversations[i].get_params(), 'cipibot.db')
+    return {'message':'update completed'}
+
+@app.put('/set_convtype/{user_number}/{convtype}')
+async def set_convtype(user_number: str, convtype: ConvType) -> dict[str, str]:
+    if user_number not in conversations: 
+        return {'detail' : 'user dont exist'}
+    conversations[user_number].set_mode(convtype)
+    return {'detail' : f'{user_number} set to {convtype}'}
+
+
 async def background_task():
     count = 0
     while True:
@@ -362,18 +414,21 @@ async def background_task2():
         await asyncio.sleep(9)
 
 
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(background_task())
     asyncio.create_task(background_task2())
     #asyncio.create_task(conversations[cfg['CONFIG']['ADMIN_NUMBER'][0]].start_coroutine())
-    asyncio.create_task(msgprocess.process_queue())
+    asyncio.create_task(msgprocess.process_queue_gpt())
+    asyncio.create_task(msgprocess.process_queue_ooba())
 
 # @app.on_event("shutdown")
 # async def shutdown_event():
 #     asyncio.current_task
 
-if __name__ == "__main__":
+#subprocess.run(["python", "startup_script.py"])
 
+if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8998)
 

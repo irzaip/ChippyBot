@@ -10,9 +10,6 @@ from typing import Literal
 
 cfg = toml.load('config.toml')
 
-WORD_LIMIT = 1000
-whatsapp_web_url = "http://localhost:8000/send" # Replace with your endpoint URL
-
 
 # Model untuk validasi input pada endpoint /interval
 class Interval(BaseModel):
@@ -29,6 +26,12 @@ class Persona(str, Enum):
     ROLEPLAY = auto()
     KOBOLD = auto()
     
+class ConvType(str, Enum):
+    DEMO = auto()
+    FRIEND = auto()
+    GOLD = auto()
+    PLATINUM = auto()
+    ADMIN = auto()
 
 class Role(str, Enum):
     SYSTEM = auto()
@@ -54,7 +57,6 @@ class ConvMode(str, Enum):
     INTERVIEW = auto()
     YESNO = auto()
     CHAIN = auto()
-
 
 
 class Message(BaseModel):
@@ -94,29 +96,46 @@ class Conversation():
         if not bot_number:
             bot_number = "6285775300227@c.us"
         self.bot_name = "Maya"
-        self.rivebot = RiveScript()
-        self.rivebot.load_directory('./rive/brain')
-        self.rivebot.sort_replies()
+        self.script =Script.BRAIN
         self.mode=ConvMode.CHITCHAT
         self.interval = 600
         self.wait_time = 0
         self.messages = []
         self.botquestions = []
-        self.WORD_LIMIT = WORD_LIMIT
+        self.WORD_LIMIT = cfg['CONFIG']['WORD_LIMIT']
         self.temperature = 0.7
         self.intro_msg = "Baik kita mulai tanya-jawab"
         self.outro_msg = "OK. semua sudah selesai, terima kasih"
         self.user_number = user_number
         self.bot_number = bot_number
         self.persona = Persona.ASSISTANT
+        self.convtype = ConvType.DEMO
         self.need_group_prefix = True
         self.last_question = 0
         self.question_asked = ""
         self.user_name = ""
+        self.free_tries = 0
+        self.profanity = False
         self.user_fullinfo = {}
-        self.add_system("Kamu adalah Maya, Assisten yang baik. Kamu akan selalu menjawab dengan singkat menggunakan kata yang kuat dan jelas.")
-        self.add_role_user("Kamu akan menjadi teman dalam chat, nama kamu Maya, dan pembuat kamu adalah Irza Pulungan, dia seorang programmer yang baik dan berbudi, kamu menjawab dengan singkat dengan gaya bahasa Raditya Dika. Saya akan mulai dengan menyapa kamu setelah ini. HALO")
-        self.add_role_assistant("Halo, nama saya Maya, ada yang bisa saya bantu?")
+        self.open_ai_key = ""
+        self.profanity_counter = 7
+        self.funny_counter = 7
+        self.promo_counter = 7
+        self.group_title = ""
+        self.free_gpt = False
+        self.demo_user = True
+        self.intro_maxs_free_gpt = 5
+        self.gpt_accessed = 0
+        self.gpt_token_used = 0
+        self.daily_free_gpt = 3
+        self.paid_messages = 0
+        self.rivebot = RiveScript()
+        # self.rivebot.load_directory('./rive/brain')
+        # self.rivebot.sort_replies()
+        self.set_script(self.script)        
+        self.add_system(cfg['MAYA']['M_S'])
+        self.add_role_user(cfg['MAYA']['M_U'])
+        self.add_role_assistant(cfg['MAYA']['M_A'])
 
 
     def add_last_question(self) -> None:
@@ -146,7 +165,7 @@ class Conversation():
         self.rivebot = RiveScript()
         self.rivebot.load_directory(all_scripts[script.name])
         self.rivebot.sort_replies()
-        print(f"Loaded {script}")
+        #print(f"Loaded {script}")
 
     def reinit_rive(self, script_file) -> None:
         self.rivebot.load_directory(script_file)
@@ -232,7 +251,7 @@ class Conversation():
         } # type: ignore
 
         print(message)
-        response = requests.post(whatsapp_web_url, json=message)
+        response = requests.post(cfg['WHATSAPP']['SEND_URL'], json=message)
 
         if response.status_code == 200:
             print("Message sent successfully!")
@@ -263,6 +282,8 @@ class Conversation():
             'outro_msg' : self.outro_msg,
             'interval' : self.interval,
             'persona' : self.persona,
+            'script' : self.script,
+            'convtype' : self.convtype,
             'need_group_prefix' : self.need_group_prefix,
             'mode' : self.mode,
             'question_asked' : self.question_asked,
@@ -270,6 +291,19 @@ class Conversation():
             'wait_time' : self.wait_time,
             'user_name' : self.user_name,
             'user_fullinfo' : self.user_fullinfo,
+            'open_ai_key' : self.open_ai_key,
+            'profanity_counter' : self.profanity_counter,
+            'funny_counter' : self.funny_counter,
+            'promo_counter' : self.promo_counter,
+            'group_title' : self.group_title,
+            'free_gpt' : self.free_gpt,
+            'demo_user' : self.demo_user,
+            'intro_max_free_gpt' : self.intro_maxs_free_gpt,
+            'gpt_accessed' : self.gpt_accessed,
+            'gpt_token_used' : self.gpt_token_used,
+            'daily_free_gpt' : self.daily_free_gpt,
+            'paid_messages' : self.paid_messages,
+            'free_tries' : self.free_tries,
         }
         return json.dumps(obj)
 
@@ -282,6 +316,8 @@ class Conversation():
         self.outro_msg = obj['outro_msg']
         self.interval = obj['interval']
         self.persona = obj['persona']
+        self.script = obj['script']
+        self.convtype = obj['convtype']
         self.need_group_prefix = obj['need_group_prefix']
         self.mode = obj['mode']
         self.question_asked = obj['question_asked']
@@ -289,13 +325,58 @@ class Conversation():
         self.wait_time = obj['wait_time']
         self.user_name = obj['user_name']
         self.user_fullinfo = obj['user_fullinfo']
+        self.open_ai_key = obj['open_ai_key']
+        self.profanity_counter = obj['profanity_counter']
+        self.funny_counter = obj['funny_counter']
+        self.promo_counter = obj['promo_counter']
+        self.group_title = obj['group_title']
+        self.free_gpt = obj['free_gpt']
+        self.demo_user = obj['demo_user']
+        self.intro_maxs_free_gpt = obj['intro_max_free_gpt']
+        self.gpt_accessed = obj['gpt_accessed']
+        self.gpt_token_used = obj['gpt_token_used']
+        self.daily_free_gpt = obj['daily_free_gpt']
+        self.paid_messages = obj['paid_messages']
+        self.free_tries = obj['free_tries']
         return "Done"
     
     def set_lisa_hrd(self) -> None:
         self.last_question = 0
         self.botquestions = []
         self.persona = Persona.HRD
-        
+
+    def tambah_free_tries(self, jumlah: int = 5):
+        self.free_tries += jumlah
+    
+    def kurangi_profanity_counter(self):
+        self.profanity_counter -= 1
+        if self.profanity_counter < 0:
+            self.profanity_counter = 0
+    
+    def kurangi_funny_counter(self):
+        self.funny_counter -= 1
+        if self.funny_counter < 0:
+            self.funny_counter = 7
+    
+    def kurangi_promo_counter(self):
+        self.promo_counter -= 1
+        if self.promo_counter < 0:
+            self.promo_counter = 7
+    
+    def kurangi_free_tries(self):
+        self.free_tries -= 1
+        if self.free_tries < 0:
+            self.free_tries = 0
+
+    def tambah_paid_messages(self, jumlah: int = 5):
+        self.paid_messages += jumlah
+
+    def kurangi_paid_messages(self) -> None:
+        self.paid_messages -= 1
+        if self.paid_messages < 0:
+            self.paid_messages = 0
+
+
 
 @dataclass
 class BotQuestion():

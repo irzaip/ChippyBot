@@ -1,8 +1,7 @@
 fastapi
 uvicorn
 rivescript
-langchain
-jupyter notebook
+langchain==0.0.160
 nest_asyncio
 nltk
 openai

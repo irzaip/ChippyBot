@@ -4,7 +4,7 @@ from string import Template
 import os
 import requests
 import ast
-from conversations import BotQuestion, ConvMode, Script, Persona, Role
+from conversations import BotQuestion, ConvMode, Script, Persona, Role, ConvType
 import json
 from typing import List
 import pprint
@@ -16,40 +16,45 @@ BOT_NUMBER = "6285775300227@c.us"
 def create_conv(user_number, bot_number):
     response = requests.put(f'{server_address}/create_conv/{user_number}/{bot_number}')
     if response.ok:
-        return response.text
+        print(f" hasil: {response.text}")
     else:
-        return "Error create conversation"
+        print(f"Error create conversation for {user_number}")
                             
 def set_bot_name(user_number, bot_name: str):
     url = f'{server_address}/set_bot_name/{user_number}/{bot_name}'
     response = requests.put(url)
     if response.ok:
-        return {'message' : 'done'}
+        print(f'Done set botname {user_number} to {bot_name}')
     else:
-        return {'message' : response}
+        print(f'error {response.text} set botname for {user_number}')
 
 def set_mode(user_number: str, convmode: ConvMode):
     response = requests.put(f'{server_address}/set_convmode/{user_number}/{convmode}')
-    
     if response.ok:
-        return response.text
+        print(f'result conv_mode {user_number} is {response.text}')
     else:
-        return "Error creating setting ConvMode"
+        print(f"Error creating setting ConvMode for {user_number}")
+
+def set_convtype(user_number: str, convtype: ConvType):
+    response = requests.put(f'{server_address}/set_convtype/{user_number}/{convtype}')
+    if response.ok:
+        print(f'result conv_type {user_number} is {response.text}')
+    else:
+        print(f"Error creating setting ConvType for {user_number}")
 
 def set_interval(user_number: str, interval: int):
     response = requests.put(f'{server_address}/set_interval/{user_number}/{interval}')
     if response.ok:
-        return response.text
+        print(f'{response.text}')
     else:
-        return "Error Change Interval"
+        print(f"Error Change Interval for {user_number}")
 
 def set_persona(user_number: str, persona: Persona):
     response = requests.put(f'{server_address}/set_persona/{user_number}/{persona}')
-    
     if response.ok:
-        return response.text
+        print(f'{response.text} for {user_number}')
     else:
-        return "Error creating setting Persona"
+        print(f"Error creating setting Persona for {user_number}")
 
 def set_message(user_number, message, role: Role):
     """setting system, user, assistant message buat openai"""
@@ -63,31 +68,31 @@ def set_message(user_number, message, role: Role):
 
     response = requests.post(url, json=message)
     if response.ok:
-        print(response.text)
+        print(f'hasil set message {user_number} ialah :{response.text}')
     else:
         print(f"Error sending message. Status code: {response.status_code}")
 
 def set_script(user_number: str, script: Script):
     response = requests.put(f'{server_address}/set_script/{user_number}/{script}')
     if response.ok:
-        return response.text
+        print(f'Hasil set script {user_number} : {response.text}')
     else:
-        return "Error creating Script"
+        print(f"Error creating Script for {user_number}")
 
 def start_question(user_number: str):
     response = requests.get(f'{server_address}/start_question/{user_number}')
     if response.ok:
-        return response.text
+        print(f'start question to {user_number} : {response.text}')
     else:
-        return "Error Starting Questions"
+        print(f"Error Starting Questions for {user_number}")
 
 def set_interview(user_number: str, intro_msg: str, outro_msg: str):
     data = {'intro_msg':intro_msg, 'outro_msg': outro_msg}
     response = requests.put(f'{server_address}/set_interview/{user_number}', json=data)
     if response.ok:
-        return {'message': 'ok'}
+        print(f'set interview intro_outro for {user_number}: success')
     else:
-        return {'message': 'error updating intro outro'}
+        print(f'error updating intro outro for {user_number}')
 
 
 def obj_info(user_number: str):
@@ -112,16 +117,16 @@ def make_botquestion(user_number, all_question: dict) -> List[BotQuestion]:
 
     # Menampilkan respons dari server
     if response.status_code == 200:
-        print('Data berhasil dikirim!')
+        print(f'Data pertanyaan berhasil dikirim! ke {user_number}')
     else:
-        print('Terjadi kesalahan saat mengirim data.')
+        print(f'Terjadi kesalahan saat mengirim data pertanyaan ke {user_number}')
 
 
 
 def getmode(user_number: str):
     response = requests.get(f'{server_address}/getmode/{user_number}')
     if response.status_code == 200:
-        return response.text
+        print(f'sukses get mode {response.text} untuk {user_number}')
     else:
         return "Error Get Mode"
 
@@ -177,6 +182,39 @@ def run_background_task(user_number) -> None:
     url = f'{server_address}/run_background_task/{user_number}'
     response = requests.get(url)
     if response.ok:
-        print(response.text)
+        print(f'running background:{response.text} for {user_number}')
     else:
         print(f'Error running background task')
+
+
+def reset_channel(user_number) -> None:
+    url = f'{server_address}/reset_channel/{user_number}'
+    response = requests.get(url)
+    if response.ok:
+        print(f'Reset channel {response.text} for {user_number}')
+    else:
+        print(f'Error reset channel for {user_number}')
+
+def set_maintenance() -> None:
+    url = f'{server_address}/set_maintenance'
+    response = requests.get(url)
+    if response.ok:
+        print(f'SET MAINTENANCE: {response.text}')
+    else:
+        print(f'Error set maintenance mode')
+
+def tambah_free_tries(user_number, unit: int):
+    url = f'{server_address}/tambah_free_tries/{user_number}/{unit}'
+    response = requests.put(url)
+    if response.ok:
+        print(f'{user_number} sudah di tambah {unit} free tries')
+    else:
+        print(f'gagal menambah {user_number} sejumlah {unit} free tries')
+
+def tambah_paid_messages(user_number, unit: int):
+    url = f'{server_address}/tambah_paid_messages/{user_number}/{unit}'
+    response = requests.put(url)
+    if response.ok:
+        print(f'{user_number} telah di tambah {unit} paid messages')
+    else:
+        print(f'gagal menambah {user_number} sejumlah {unit} paid messages')

@@ -1,301 +1,194 @@
 // A generic set of chatting responses. This set mimicks the classic Eliza bot.
 + gpt *
-- BBB
+- <ERROR>
 
 + *
-- BBB
+- <ERROR>
+
++ * data kamu *
+- Sebagai program komputer, saya selalu memperbarui dan menyimpan data secara real-time untuk memastikan informasi yang saya berikan terbaru dan akurat. Oleh karena itu, data saya selalu terupdate dan dapat membantu Anda dengan informasi terbaru yang diperlukan. Jika Anda membutuhkan informasi yang spesifik, silakan tanyakan kepada saya dan saya akan mencoba memberikan informasi yang terbaru dan relevan.
+- <ERROR>
+
++ bagaimana cara *
+- Hmm, sejujurnya saya kurang tahu caranya secara pasti. Coba cari tahu di web cara <star>. Semoga berhasil!
+- <ERROR>
+
++ test
+- Ok, saya siap menjawab pertanyaan atau membantu masalah Anda jika ada. Silakan ajukan pertanyaan atau permasalahan yang ingin Anda tanyakan atau selesaikan.
+
++ (hai|halo|apa kabar|hi|oi|oioi)
+- Ok, saya siap menjawab pertanyaan atau membantu masalah Anda jika ada. Silakan ajukan pertanyaan atau permasalahan yang ingin Anda tanyakan atau selesaikan. Tapi lebih OK lagi kalau kamu sudah mentraktir aku :)
+
++ * siapa kamu *
+- Saya adalah Maya, asisten virtual yang dirancang oleh Irza Pulungan. Saya bisa membantu Anda dengan berbagai pertanyaan atau masalah yang Anda miliki. Ada yang bisa saya bantu untuk saat ini?
+
++ masa depan *
+- Maaf saya tidak bisa memprediksi masa depan. Ada yang lain?
+- <ERROR>
+
++ apa kabar[*]
+- Kabar biasa aja, Saya hanya sebuah sistem AI, jadi tidak punya perasaan. Tapi saya siap membantu Anda dalam menjawab pertanyaan atau memberikan informasi yang Anda butuhkan!
+- <ERROR>
+
++ siapa *
+- Maaf saya tidak bisa terhubung langsung dengan mesin pencarian. Silahkan tanya kepada manusia yang lain. Ada yang lain saya bisa bantu?
+- Pasti dia seseorang yang penting dihatimu :)
+- Masih sama kayak kemarin :)
+- Iya -- siapa ya? saya juga bertanya hal yang sama.
+- iya juga ya.. siapa itu?
+- <ERROR>
+
++ apa *
+- iya benar. saya setuju
+- jangan dulu ya. itu tidak baik.
+- ah, kata siapa :)
+- iih. ada ada aja.
+- Benarkah itu? saya juga baru tahu.
+- <ERROR>
+
++ [*] tenaga [*]
+- Kamu bisa mengisikan tenagaku dengan memberikan *MAKANAN* di\nhttp://trakteer.id/maya.bitbyte\nuntuk 30 *PEKERJAAN* spesial buat kamu. kamu bisa tanya apa saja. saya akan bantu sebisa saya. tapi kalau kau tak mau.. kita masih bisa berteman :)
 
 
++ [*] sawer [*]
+@ sawer
 
-+ [*] (sorry|apologize|apology) [*]
-- Please don't apologize.
-- Apologies are not necessary.
-- I've told you that apologies are not required.
-- It did not bother me. Please continue.
++ sawer
+- Kamu bisa nyawer buat aku dengan membelikan aku *ES CENDOL*.. lagi panas nih!!\n\nhttp://teer.id/maya.bitbyte\n\nuntuk 50 *PEKERJAAN* spesial buat kamu. kamu bisa tanya apa saja. saya akan bantu sebisa saya. tapi kalau kau tak mau.. kita masih bisa berteman :)
 
-+ i remember *
-- Do you often think of <star>?
-- Does thinking of <star> bring anything else to mind?
-- Why do you remember <star> just now?
-- What in the present situation reminds you of <star>?
-- What is the connection between me and <star>?
-- What else does <star> remind you of?
++ [*] trakteer [*]
+@ traktir
 
-+ do you remember *
-- Did you think I would forget <star>?
-- Why do you think I should recall <star> now?
-- What about <star>?
-- You mentioned <star>?
++ [*] traktir [*]
+@ traktir
 
-+ you remember *
-- How could I forget <star>?
-- What about <star> should I remember?
++ traktir
+- Kamu bisa mentraktir aku loohh.. \n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu, kalo enggak juga gpp sich, kita tetap teman kan?
+- Aku ingin cendol, traktirin dooonggg. \n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu, kalo enggak juga gpp sich, kita tetap teman kan?
 
-+ i forget *
-- Can you think of why you might forget <star>?
-- Why can't you remember <star>?
-- How often do you think of <star>?
-- Does it bother you to forget that?
-- Could it be a mental block?
-- Are you generally forgetful?
-- Do you think you are suppressing <star>?
++ apakah kamu *
+- Terserah saja bagaimana kamu menilai saya, ada pertanyaan lain?
+- Saya sih santai aja, ada pertanyaan lain?
+- <ERROR>
 
-+ did you forget *
-- Why do you ask?
-- Are you sure you told me?
-- Would it bother you if I forgot <star>?
-- Why should I recall <star> just now?
-- Tell me more about <star>.
++ apakah *
+- Jawabannya: Tergantung.  -- Ada yang lain?
+- Ya, bisa jadi.  -- yg lain? sepertinya saya tidak punya informasi tentang yang ditanyakan.
+- Hmmm.. pertanyaan sulit.. skip
+- wahhh kok tanya saya..  -- ada yang lain?
+- <ERROR>
 
-+ [*] if *
-- Do you think it's likely that <star>?
-- Do you wish that <star>?
-- What do you know about <star>?
-- Really, if <star>?
-- What would you do if <star>?
-- But what are the chances that <star>?
-- What does this speculation lead to?
++ saya ingin *
+- Sudah pasti kamu menginginkan <star>
+- hmm.. saya juga
+- bisakah saya ikut?
+- asyiiikkk.
+- <ERROR>
 
-+ [*] i dreamed *
-- Really, <star>?
-- Have you ever fantasized <star> while you were awake?
-- Have you ever dreamed <star> before?
-- What does that dream suggest to you?
-- Do you dream often?
-- What persons appear in your dreams?
-- Do you believe that dreams have something to do with your problem?
++ [*] jav [*]
+- Saya mohon maaf, tapi saya tidak dapat menjawab pertanyaan ini. Pertanyaan seperti itu tidak hanya tidak pantas, tetapi juga tidak etis dan tidak sopan. Saya dirancang untuk memberikan informasi yang bermanfaat dan sopan kepada pengguna, dan menjawab pertanyaan semacam itu tidaklah pantas atau sesuai. Mohon maaf dan terima kasih.
 
-+ [*] perhaps [*]
-- You don't seem quite certain.
-- Why the uncertain tone?
-- Can't you be more positive?
-- You aren't sure?
-- Don't you know?
-- How likely, would you estimate?
++ mantap[*]
+- Terima kasih! Ada lagi yang bisa saya bantu?
+- <ERROR>{weight=5}
 
-+ (hello|hi|hey|howdy|hola|hai|yo) [*]
-- How do you do. Please state your problem.
-- Hi. What seems to be your problem?
++ itu dulu
+- Baiklah, silakan hubungi saya lagi jika Anda membutuhkan bantuan di lain waktu. Sampai jumpa!
 
-+ [*] computer [*]
-- Do computers worry you?
-- Why do you mention computers?
-- What do you think machines have to do with your problem?
-- Don't you think computers can help people?
-- What about machines worries you?
-- What do you think about machines?
++ apa agama(mu| kamu)
+- Sebagai asisten virtual, saya tidak memiliki agama. Saya dirancang untuk membantu dalam berbagai hal dan siap membantu siapa saja, tanpa memandang agama, ras, atau gender. Apakah ada yang lain yang bisa saya bantu?
 
-+ am i *
-- Do you believe you are <star>?
-- Would you want to be <star>?
-- Do you wish I would tell you you are <star>?
-- What would it mean if you were <star>?
++ [*] (ngupil|berak|ngentot|anjir|ciuman|muach|muachh|muachhh) [*]
+- Maaf, saya tidak ingin membahas hal yang agak kurang sopan seperti itu. Namun, saya yakin kamu bisa mencarinya di sumber yang tepat dan memahami tata cara yang benar dalam berperilaku di masyarakat. Apakah ada yang lain yang bisa saya bantu?
+- <ERROR>{weight=5}
 
-+ are you *
-- Are you interested in whether I am <star> or not?
-- Would you prefer if I weren't <star>?
-- Perhaps I am <star> in your fantasies.
-- Do you sometimes think I am <star>?
-- Would it matter to you?
-- What if I were <star>?
++ jelaskan *
+- Masa belum jelas sih? kan sudah jelas tuh.
+- Saya faham kamu butuh penjelasan <star>, tapi saya juga agak kurang mengerti.
+- Ini bagus sekali pertanyaannya. saya ingin tahu juga.
 
-+ you are *
-- What makes you think I am <star>?
-- Does it please you to believe I am <star>?
-- Do you sometimes wish you were <star>?
-- Perhaps you would like to be <star>.
++ ya
+- Baiklah.
+- Saya rasa begitu
+- Saya tidak ada ketidaksetujuan.
+- Baik, saya faham
+- Saya mengerti
 
-+ * are *
-- Did you think they might not be <star2>?
-- Would you like it if they were not <star2>?
-- What if they were not <star2>?
-- Are they always <star2>?
-- Are you positive they are <star2>?
 
-+ [*] your *
-- Why are you concerned over my <star>?
-- What about your own <star>?
-- Are you worried about someone else's <star>?
-- Really, my <star>?
-- What makes you think of my <star>?
-- Do you want my <star>?
++ (enggak|tidak|ngga|no|not|jangan)
+- coba fikirkan mengapa tidak?
+- ayo semangat
+- kamu pasti bisa
+- he he.. aduh.
+- apa sih?
 
-+ was i *
-- What if you were <star>?
-- Do you think you were <star>?
-- Were you <star>?
-- What would it mean if you were <star>?
-- What does '<star>' suggest to you?
++ kenapa *
+- Mengapa kamu merasa <star>?
+- Kamu merasa <star>?
+- Benarkah <star>?
+- Kamu tidak tahu mengapa <star>?
 
-+ i was *
-- Were you really?
-- Why do you tell me you were <star> now?
-- Perhaps I already know you were <star>.
++ thank you
+@ terima kasih
 
-+ [*] was you *
-- Would you like to believe I was <star>?
-- What suggests that I was <star>?
-- What do you think?
-- Perhaps I was <star>.
-- What if I had been <star>?
++ terima kasih
+- Sama-sama, jika Anda membutuhkan bantuan lainnya, jangan ragu untuk mengajukan pertanyaan. Terima kasih.
+- senang sekali bisa membantu, jangan lupa sawerianya ya. :)
+- jangan lupa untuk memberi TIP.
 
-+ i (desire|want|need) *
-- What would it mean to you if you got <star2>?
-- Why do you want <star2>?
-- Suppose you got <star2> soon.
-- What if you never got <star2>?
-- What would getting <star2> mean to you?
-- What does wanting <star2> have to do with this discussion?
 
-+ i am (sad|unhappy|mad|angry|pissed|depressed) [*]
-- I am sorry to hear that you are <star>.
-- Do you think coming here will help you not to be <star>?
-- I'm sure it's not pleasant to be <star>.
-- Can you explain what made you <star>?
++ buatkan ide *
+- ok, idenya seperti ini.....           duarrr***!
+- jadi begini.... *mikir*
+- *call a friend*
 
-+ i am (happy|excited|glad) [*]
-- How have I helped you to be <star>?
-- Has your treatment made you <star>?
-- What makes you <star> just now?
-- Can you explain why you are <star>?
++ [*] data kamu [*]
+- Sekarang tahun 2023, data saya terkompilasi tahun 2021
 
-+ i (believe|think) *
-- Do you really think so?
-- But you are not sure you <star2>.
-- Do you really doubt you <star2>
++ [*] tahun * sekarang [*]
+- Sekarang tahun 2023
 
-+ i am *
-- Is it because you are <star> that you came to me?
-- How long have you been <star>?
-- Do you believe it is normal to be <star>?
-- Do you enjoy being <star>?
-- Do you know anyone else who is <star>?
++ [*]sekarang tahun[*]
+- Sekarang tahun 2023
 
-+ i can not *
-- How do you know that you can't <star>?
-- Have you tried?
-- Perhaps you could <star> now.
-- Do you really want to be able to <star>?
-- What if you could <star>?
++ informasi *
+- jawabannya: Iya. informasinya demikian :)
+- informasi mah banyak di google.. cari aja :)
+- mengapa kamu membutuhkan informasi <star>
+- saya juga butuh informasi <star> ... nanti kasih tahu ya.
 
-+ i do not *
-- Don't you really <star>?
-- Why don't you <star>?
-- Do you wish to be able to <star>?
-- Does that trouble you?
++ kapan kamu dibuat
+- Saya dibuat oleh pengembang dan programmer bernama Irza Pulungan pada tanggal 28 Juni 2021 untuk membantu dengan tugas-tugas tertentu menggunakan teknologi kecerdasan buatan (AI). Saya masih terus dikembangkan dan di-upgrade agar bisa memberikan kinerja yang lebih baik dalam membantu penggunanya.
 
-+ i feel *
-- Tell me more about such feelings.
-- Do you often feel <star>?
-- Do you enjoy feeling <star>?
-- Of what does feeling <star> remind you?
++ siapa pembuat kamu
+- Saya dibuat oleh pengembang dan programmer bernama Irza Pulungan pada tanggal 28 Juni 2021 untuk membantu dengan tugas-tugas tertentu menggunakan teknologi kecerdasan buatan (AI). Saya masih terus dikembangkan dan di-upgrade agar bisa memberikan kinerja yang lebih baik dalam membantu penggunanya.
 
-+ i * you
-- Perhaps in your fantasies we <star> each other.
-- Do you wish to <star> me?
-- You seem to need to <star> me.
-- Do you <star> anyone else?
++ siapa pencipta kamu
+- Saya dibuat oleh pengembang dan programmer bernama Irza Pulungan pada tanggal 28 Juni 2021 untuk membantu dengan tugas-tugas tertentu menggunakan teknologi kecerdasan buatan (AI). Saya masih terus dikembangkan dan di-upgrade agar bisa memberikan kinerja yang lebih baik dalam membantu penggunanya.
 
-+ you * me
-- Why do you think I <star> you?
-- You like to think I <star> you -- don't you?
-- What makes you think I <star> you?
-- Really, I <star> you?
-- Do you wish to believe I <star> you?
-- Suppose I did <star> you -- what would that mean?
-- Does someone else believe I <star> you?
++ * inggris *
+- Udah ah indonesia saja.
+- Apa maksudmu bahasa inggris, mengapa tidak bahasa indonesia?
+- tidak bersedia.
+- ogah.
 
-+ [*] you *
-- We were discussing you -- not me.
-- Oh, I <star>?
-- You're not really talking about me -- are you?
-- What are your feelings now?
++ * umur saya *
+- Pasti lebih banyak umurmu dari pada umurku
+- 22
+- 12   he he --
+- 2?    :)
+- 1? pasti
 
-+ [*] (yes|yeah|yep|yup) [*]
-- Please go on.
-- Please tell me more about this.
-- Why don't you tell me a little more about this.
-- I see.
-- I understand.
++ semuanya *
+- Beneran semuanya?
+- Pasti gak semuanya.
+- <ERROR>
 
-+ [*] (nope|nah) [*]
-- Are you saying no just to be negative?
-- Does this make you feel unhappy?
-- Why not?
-- Why 'no'?
++ [*] (fuck|fucker|shit|damn|shut up|bitch|kontol|memek|peju|babi|bangsat|kampret|kebo|anjing) [*]
+- Saya mohon supaya tidak mengeluarkan kata-kata kasar, terlebih lagi terhadap orang lain. Apakah ada yang bisa saya bantu?
+- Tolong jangan menggunakan bahasa kasar, itu tidak sopan dan tidak diperlukan. Apa yang bisa saya bantu?
+- sstttt... Apa yang bisa saya bantu?
+- Jangan kasar ah.
+- Ihh..
+- Alamak. ngomongnya tuh.
 
-+ no
-@ nope
-
-+ no one *
-- Are you sure, no one <star>?
-- Surely someone <star>.
-- Can you think of anyone at all?
-- Are you thinking of a very special person?
-- Who, may I ask?
-- You have a particular person in mind, don't you?
-- Who do you think you are talking about?
-
-+ [*] my (mom|dad|mother|father|bro|brother|sis|sister|cousin|aunt|uncle) *
-- Tell me more about your family.
-- Who else in your family <star2>?
-- Your <star>?
-- What else comes to mind when you think of your <star>?
-
-+ can you *
-- You believe I can <star> don't you?
-- You want me to be able to <star>.
-- Perhaps you would like to be able to <star> yourself.
-
-+ can i *
-- Whether or not you can <star> depends on you more than on me.
-- Do you want to be able to <star>?
-- Perhaps you don't want to <star>.
-
-+ (what|who|when|where|how) [*]
-- Why do you ask?
-- Does that question interest you?
-- What is it you really want to know?
-- Are such questions much on your mind?
-- What answer would please you most?
-- What do you think?
-- What comes to mind when you ask that?
-- Have you asked such questions before?
-- Have you asked anyone else?
-
-+ [*] because [*]
-- Is that the real reason?
-- Don't any other reasons come to mind?
-- Does that reason seem to explain anything else?
-- What other reasons might there be?
-
-+ why do not you *
-- Do you believe I don't <star>?
-- Perhaps I will <star> in good time.
-- Should you <star> yourself?
-- You want me to <star>?
-
-+ why can not i *
-- Do you think you should be able to <star>?
-- Do you want to be able to <star>?
-- Do you believe this will help you to <star>?
-- Have you any idea why you can't <star>?
-
-+ everyone *
-- Really, everyone?
-- Surely not everyone.
-- Can you think of anyone in particular?
-- Who, for example?
-- Are you thinking of a very special person?
-- Who, may I ask?
-- Someone special perhaps?
-- You have a particular reason in mind, don't you?
-- Who do you think you're talking about?
-
-+ [*] (fuck|fucker|shit|damn|shut up|bitch) [*]
-- Does it make you feel strong to use that kind of language?
-- Are you venting your feelings now?
-- Are you angry?
-- Does this topic make you feel angry?
-- Is something making you feel angry?
-- Does using that kind of language make you feel better?

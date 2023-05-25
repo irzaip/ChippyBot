@@ -15,7 +15,7 @@ def insert_conv(user_number, bot_number, timestamp, content, db_name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO CONVERSATION (user_number, bot_number, timestamp, content) VALUES (?,?,?,?)", (user_number, bot_number, timestamp, content))
-    result = cursor.fetchall()
+    conn.commit()
     cursor.close()
     conn.close()
     return "Done inserting"
