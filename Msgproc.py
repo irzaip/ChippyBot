@@ -154,6 +154,15 @@ class MsgProcessor:
             print(f"{Fore.RED}{Back.WHITE}Called.. But ON MAINTENANCE NOW{Fore.WHITE}{Back.BLACK}")
             return "*BRB* - Be Right Back .. ZzzZzz ZZzzzz.."
 
+        if (conv_obj.convtype == ConvType.ADMIN) or conv_obj.free_gpt:
+            result = await self.ask_gpt(conv_obj, message.text)
+            insert_conv(conv_obj.user_number,
+                        conv_obj.bot_number,
+                        int(datetime.datetime.utcnow().timestamp()), 
+                        result, self.db_file)
+            result = f"{result}\n\n\u2764".strip()
+            return result 
+
         if conv_obj.convtype == ConvType.FRIEND:
             if conv_obj.paid_messages:
                 conv_obj.kurangi_paid_messages
@@ -191,17 +200,17 @@ class MsgProcessor:
 
 
         # PROCESS BY PERSONA AND MODE
-        if conv_obj.mode == ConvMode.YESNO:
+        if conv_obj.convmode == ConvMode.YESNO:
             if "y" in message.text.lower():
                 return "Kamu menjawab ya"
             if "t" in message.text.lower():
                 return "Kamu menjawab tidak"
 
-        if conv_obj.mode == ConvMode.ASK:
+        if conv_obj.convmode == ConvMode.ASK:
             if "ok" in message.text.lower():
                 return "oke juga"
 
-        if conv_obj.mode == ConvMode.INTERVIEW:
+        if conv_obj.convmode == ConvMode.INTERVIEW:
             #mengisi answer yg masih kosong.
             (i,k) = conv_obj.get_last_question()
             if i < (k-1):
@@ -212,7 +221,7 @@ class MsgProcessor:
                     return r_text
                 except Exception as e:
                     print(e)                 
-            conv_obj.mode = ConvMode.CHITCHAT
+            conv_obj.convmode = ConvMode.CHITCHAT
             conv_obj.set_script(Script.BRAIN)
             return conv_obj.outro_msg
 

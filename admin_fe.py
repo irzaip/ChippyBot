@@ -1,7 +1,7 @@
 #ADMIN FRONT END
 import gradio as gr
 import cipi_iface as cp
-from conversations import Persona, Script, ConvMode, ConvType
+from conversations import Persona, Script, ConvMode, ConvType, Role
 
 
 def get_conv_(user_filter: str):
@@ -19,12 +19,12 @@ conversations = {}
 
 def get_user_number(user_number: str) -> str:
     return user_number.split('###')[0].strip()
-    return result
+
 
 def main():
     all_conv = []
     persona = [e.name for e in Persona]
-    mode = [e.name for e in ConvMode]
+    convmode = [e.name for e in ConvMode]
     script = [e.name for e in Script]
     convtype = [e.name for e in ConvType]
 
@@ -33,6 +33,25 @@ def main():
 
     def clean_(user_number: str):
         return user_number.split('###')[0].strip()
+    
+    def set_system_(user_number: str, message: str):
+        cp.set_message(user_number=user_number, message=message, role=Role.SYSTEM)
+    
+    def set_user_(user_number: str, message: str):
+        cp.set_message(user_number=user_number, message=message, role=Role.USER)
+
+    def set_assistant_(user_number: str, message: str):
+        cp.set_message(user_number=user_number, message=message, role=Role.ASSISTANT)
+    
+
+    def set_script_(user_number: str, script: Script): 
+        cp.set_script(clean_(user_number), script=script)
+
+    def set_convmode_(user_number: str, convmode: ConvMode):
+        cp.set_convmode(clean_(user_number), convmode=convmode)
+
+    def set_persona_(user_number: str, persona: Persona):
+        cp.set_persona(clean_(user_number), persona=persona)
 
     def set_convtype_(user_number: str, convtype: ConvType):
         cp.set_convtype(clean_(user_number), convtype=convtype)
@@ -52,12 +71,12 @@ def main():
         #return 
         return [
             result,
-            result['messages'][0],
-            result['messages'][1],
-            result['messages'][2],
+            result['messages'][0]['content'],
+            result['messages'][1]['content'],
+            result['messages'][2]['content'],
             result['interval'],
             Persona(result['persona']).name,
-            ConvMode(result['mode']).name,
+            ConvMode(result['convmode']).name,
             #Script(result['script']).name,
             result['intro_msg'],
             result['outro_msg'],
@@ -109,16 +128,16 @@ def main():
 
         with gr.Row():
             persona = gr.Dropdown(choices=persona, label="Persona", interactive=True, allow_custom_value=True)
-            set_persona = gr.Button(value="Set")
-            set_persona.style(size='sm', full_width=False)
+            st_persona = gr.Button(value="Set")
+            st_persona.style(size='sm', full_width=False)
 
-            mode = gr.Dropdown(choices=mode, label="Mode", interactive=True, allow_custom_value=True)
-            set_mode = gr.Button(value="Set")
-            set_mode.style(size='sm', full_width=False)
+            convmode = gr.Dropdown(choices=convmode, label="Mode", interactive=True, allow_custom_value=True)
+            st_convmode = gr.Button(value="Set")
+            st_convmode.style(size='sm', full_width=False)
         with gr.Row():
             script = gr.Dropdown(choices=script, label="Script")
-            set_script = gr.Button(value="Set")
-            set_script.style(size='sm', full_width=False)
+            st_script = gr.Button(value="Set")
+            st_script.style(size='sm', full_width=False)
 
             interval = gr.Textbox(label="Timed Interval", interactive=True)
             set_interval = gr.Button(value="Set Interval")
@@ -139,19 +158,36 @@ def main():
             intro_msg = gr.Textbox(label="Intro Message", interactive=True)
             outro_msg = gr.Textbox(label="Outro Message", interactive=True)
             in_out_msg = gr.Button(value="Set Intro and Outro")
+
         with gr.Column():
             questions = gr.Textbox(label="Questions", lines=7, interactive=True)
             set_questions = gr.Button(value="Set Questions")
-        with gr.Column():
-            he = gr.Textbox(label="hehe", interactive=True)
-    
+
+        with gr.Row():
+            say_this = gr.Textbox(label="hehe..", interactive=True)
+            say_btn = gr.Button(value="Say", interactive=True)
+            say_btn.style(size='sm', full_width=False)
+
+        with gr.Row():
+            temperature = gr.Textbox(label="Temp", interactive=True)
+            temp_btn = gr.Button(value="Set Temp", interactive=True)
+            temp_btn.style(size='sm', full_width=False)
+            toggle_free_gpt = gr.Button(value="Toggle Free GPT", interactive=True)
+            toggle_free_gpt.style(size='sm', full_width=False)
+
         #definisi klik
         refresh_contact.click(fn=get_conv_, inputs=user_filter, outputs=contacts)
         reset_ch.click(fn=reset_channel_, inputs=contacts)
-        retrieve_data.click(fn=_conversation_info, inputs=contacts, outputs=[json_msg, sys_msg, user_msg,assistant_msg, interval, persona, mode, intro_msg, outro_msg, bot_name, user_name])
+        retrieve_data.click(fn=_conversation_info, inputs=contacts, outputs=[json_msg, sys_msg, user_msg,assistant_msg, interval, persona, convmode, intro_msg, outro_msg, bot_name, user_name])
         st_convtype.click(fn=set_convtype_ , inputs=[contacts, convtype])
         st_free_tries.click(fn=tambah_free_tries_, inputs=[contacts,unit])
         st_paid_messages.click(fn=tambah_paid_messages_, inputs=[contacts,unit])
+        st_persona.click(fn=set_persona_, inputs=[contacts, persona])
+        st_convmode.click(fn=set_convmode_, inputs=[contacts, convmode])
+        st_script.click(fn=set_script_, inputs=[contacts, script])
+        sys_set.click(fn=set_system_, inputs=[contacts, sys_msg])
+        user_set.click(fn=set_user_, inputs=[contacts, user_msg])
+        assistant_set.click(fn=set_assistant_, inputs=[contacts, assistant_msg])
 
     admin.launch(server_port=9666, share=True)
 

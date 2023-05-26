@@ -223,7 +223,7 @@ async def put_botquestion(user_number: str, botquestion: List[BotQuestion]) -> d
 async def set_mode(user_number: str, convmode: ConvMode) -> dict[str, str]:
     if user_number not in conversations: 
         return {'detail' : 'user dont exist'}
-    conversations[user_number].set_mode(convmode)
+    conversations[user_number].set_convmode(convmode)
     return {'detail' : f'set to {convmode}'}
 
 @app.get('/botq/{user_number}')
@@ -254,7 +254,7 @@ async def start_question(user_number: str) -> dict[str, str]:
     return {'message' : 'done'}
 
 
-@app.get('/set_script/{user_number}/{script}')
+@app.put('/set_script/{user_number}/{script}')
 async def set_script(user_number: str, script: Script) -> dict[str, str]:
     """Merubah macam-macam script mukakmu lah."""
     if user_number not in conversations:
@@ -395,7 +395,7 @@ async def rebuild_connection_db():
 async def set_convtype(user_number: str, convtype: ConvType) -> dict[str, str]:
     if user_number not in conversations: 
         return {'detail' : 'user dont exist'}
-    conversations[user_number].set_mode(convtype)
+    conversations[user_number].set_convtype(convtype)
     return {'detail' : f'{user_number} set to {convtype}'}
 
 

@@ -97,7 +97,7 @@ class Conversation():
             bot_number = "6285775300227@c.us"
         self.bot_name = "Maya"
         self.script =Script.BRAIN
-        self.mode=ConvMode.CHITCHAT
+        self.convmode=ConvMode.CHITCHAT
         self.interval = 600
         self.wait_time = 0
         self.messages = []
@@ -119,7 +119,7 @@ class Conversation():
         self.user_fullinfo = {}
         self.open_ai_key = ""
         self.profanity_counter = 7
-        self.funny_counter = 7
+        self.funny_counter = 4
         self.promo_counter = 7
         self.group_title = ""
         self.free_gpt = False
@@ -133,9 +133,9 @@ class Conversation():
         # self.rivebot.load_directory('./rive/brain')
         # self.rivebot.sort_replies()
         self.set_script(self.script)        
-        self.add_system(cfg['MAYA']['M_S'])
-        self.add_role_user(cfg['MAYA']['M_U'])
-        self.add_role_assistant(cfg['MAYA']['M_A'])
+        self.add_system(cfg['AST']['M_S'])
+        self.add_role_user(cfg['AST']['M_U'])
+        self.add_role_assistant(cfg['AST']['M_A'])
 
 
     def add_last_question(self) -> None:
@@ -202,9 +202,12 @@ class Conversation():
     def __repr__(self) -> str:
         return f"user{self.user_number}"
     
-    def set_mode(self, mode: ConvMode) -> None:
-        self.mode = mode
+    def set_convmode(self, convmode: ConvMode) -> None:
+        self.convmode = convmode
 
+    def set_convtype(self, convtype: ConvType):
+        self.convtype = convtype
+        
     def set_interval(self, interval: int) -> None:
         self.interval = interval
 
@@ -285,7 +288,7 @@ class Conversation():
             'script' : self.script,
             'convtype' : self.convtype,
             'need_group_prefix' : self.need_group_prefix,
-            'mode' : self.mode,
+            'convmode' : self.convmode,
             'question_asked' : self.question_asked,
             'temperature' : self.temperature,
             'wait_time' : self.wait_time,
@@ -319,7 +322,7 @@ class Conversation():
         self.script = obj['script']
         self.convtype = obj['convtype']
         self.need_group_prefix = obj['need_group_prefix']
-        self.mode = obj['mode']
+        self.convmode = obj['convmode']
         self.question_asked = obj['question_asked']
         self.temperature = obj['temperature']
         self.wait_time = obj['wait_time']

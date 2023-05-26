@@ -28,15 +28,15 @@ def set_bot_name(user_number, bot_name: str):
     else:
         print(f'error {response.text} set botname for {user_number}')
 
-def set_mode(user_number: str, convmode: ConvMode):
-    response = requests.put(f'{server_address}/set_convmode/{user_number}/{convmode}')
+def set_convmode(user_number: str, convmode: ConvMode):
+    response = requests.put(f'{server_address}/set_convmode/{user_number}/{ConvMode[convmode].value}')
     if response.ok:
         print(f'result conv_mode {user_number} is {response.text}')
     else:
         print(f"Error creating setting ConvMode for {user_number}")
 
 def set_convtype(user_number: str, convtype: ConvType):
-    response = requests.put(f'{server_address}/set_convtype/{user_number}/{convtype}')
+    response = requests.put(f'{server_address}/set_convtype/{user_number}/{ConvType[convtype].value}')
     if response.ok:
         print(f'result conv_type {user_number} is {response.text}')
     else:
@@ -50,7 +50,7 @@ def set_interval(user_number: str, interval: int):
         print(f"Error Change Interval for {user_number}")
 
 def set_persona(user_number: str, persona: Persona):
-    response = requests.put(f'{server_address}/set_persona/{user_number}/{persona}')
+    response = requests.put(f'{server_address}/set_persona/{user_number}/{Persona[persona].value}')
     if response.ok:
         print(f'{response.text} for {user_number}')
     else:
@@ -73,7 +73,7 @@ def set_message(user_number, message, role: Role):
         print(f"Error sending message. Status code: {response.status_code}")
 
 def set_script(user_number: str, script: Script):
-    response = requests.put(f'{server_address}/set_script/{user_number}/{script}')
+    response = requests.put(f'{server_address}/set_script/{user_number}/{Script[script].value}')
     if response.ok:
         print(f'Hasil set script {user_number} : {response.text}')
     else:
