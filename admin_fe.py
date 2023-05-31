@@ -7,7 +7,7 @@ from conversations import Persona, Script, ConvMode, ConvType, Role
 def get_conv_(user_filter: str):
     all_conv = cp.get_conversations()
     print(all_conv)
-    all_conv = cp.json.loads(all_conv)
+    all_conv = cp.json.loads(all_conv) # type: ignore
     all_conv = list(all_conv['message'])
     result = []
     for i in all_conv:
@@ -61,6 +61,9 @@ def main():
 
     def tambah_free_tries_(user_number: str, unit: int):
         cp.tambah_free_tries(clean_(user_number), unit)
+
+    def toggle_free_gpt_(user_number: str):
+        cp.toggle_free_gpt(clean_(user_number))
 
     def _conversation_info(user_number: str) -> list:
         un = user_number.split('###')[0].strip()
@@ -188,7 +191,8 @@ def main():
         sys_set.click(fn=set_system_, inputs=[contacts, sys_msg])
         user_set.click(fn=set_user_, inputs=[contacts, user_msg])
         assistant_set.click(fn=set_assistant_, inputs=[contacts, assistant_msg])
-
+        toggle_free_gpt.click(fn=toggle_free_gpt_, inputs=[contacts])
+        
     admin.launch(server_port=9666, share=True)
 
 

@@ -19,9 +19,9 @@ grp = "120363149813038443@g.us"
 un = irza
 
 cp.set_bot_name(un, "Maya")
-cp.set_message(un, cfg['VOL']['M_S'], Role.SYSTEM)
-cp.set_message(un, cfg['VOL']['M_U'], Role.USER)
-cp.set_message(un, cfg['VOL']['M_A'], Role.ASSISTANT)
+cp.set_message(un, cfg['VOLD']['M_S'], Role.SYSTEM)
+cp.set_message(un, cfg['VOLD']['M_U'], Role.USER)
+cp.set_message(un, cfg['VOLD']['M_A'], Role.ASSISTANT)
 
 
 print(f"{Fore.RED}{Back.WHITE}Done RUNNING STARTUP SCRIPT{Fore.RESET}{Back.RESET}")

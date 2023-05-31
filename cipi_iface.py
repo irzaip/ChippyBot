@@ -63,7 +63,7 @@ def set_message(user_number, message, role: Role):
         "user_number": user_number, # Replace with the sender number
         "bot_number": BOT_NUMBER, # Replace with the recipient number in WhatsApp format
         "message": message,
-        "role": role.name,
+        "role": role,
     }
 
     response = requests.post(url, json=message)
@@ -218,3 +218,11 @@ def tambah_paid_messages(user_number, unit: int):
         print(f'{user_number} telah di tambah {unit} paid messages')
     else:
         print(f'gagal menambah {user_number} sejumlah {unit} paid messages')
+
+def toggle_free_gpt(user_number):
+    url = f'{server_address}/toggle_free_gpt/{user_number}'
+    response = requests.put(url)
+    if response.ok:
+        print(f'{user_number} telah di toggle setting free_gpt nya')
+    else:
+        print(f'gagal toggle {user_number} setting free gpt')
