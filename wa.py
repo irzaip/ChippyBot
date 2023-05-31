@@ -287,7 +287,7 @@ async def reset_channel(user_number: str) -> dict[str, str]:
     if user_number not in conversations:
         return {'detail' : 'user dont exist'}
     pf.set_persona(Persona.ASSISTANT, conversations[user_number])
-    pf.set_personality("Maya", "AST", "Hai, Aku Maya, aku akan berusaha membantumu", conversations[user_number])
+    pf.set_personality("Maya", "ASSISTANT", "Hai, Aku Maya, aku akan berusaha membantumu", conversations[user_number])
     return {'message' : 'reset done'}
 
 
