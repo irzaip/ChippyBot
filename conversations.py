@@ -7,9 +7,9 @@ import requests
 import asyncio
 import json
 from typing import Literal
+import conv_func as cf
 
 cfg = toml.load('config.toml')
-
 
 # Model untuk validasi input pada endpoint /interval
 class Interval(BaseModel):
@@ -24,6 +24,8 @@ class Persona(str, Enum):
     CONTENT_CREATOR = auto()
     PSYCHOLOG = auto()
     ROLEPLAY = auto()
+    VOLD = auto()
+    INDOSOAI = auto()
     KOBOLD = auto()
     
 class ConvType(str, Enum):
@@ -114,7 +116,7 @@ class Conversation():
         self.last_question = 0
         self.question_asked = ""
         self.user_name = ""
-        self.free_tries = 0
+        self.free_tries = 15
         self.profanity = False
         self.user_fullinfo = {}
         self.open_ai_key = ""
@@ -133,23 +135,10 @@ class Conversation():
         # self.rivebot.load_directory('./rive/brain')
         # self.rivebot.sort_replies()
         self.set_script(self.script)        
-        self.add_system(cfg['AST']['M_S'])
-        self.add_role_user(cfg['AST']['M_U'])
-        self.add_role_assistant(cfg['AST']['M_A'])
+        cf.add_system(self, cfg['ASSISTANT']['M_S'])
+        cf.add_role_user(self, cfg['ASSISTANT']['M_U'])
+        cf.add_role_assistant(self, cfg['ASSISTANT']['M_A'])
 
-
-    def add_last_question(self) -> None:
-        self.last_question += 1
-
-    def reset_last_question(self) -> None:
-        self.last_question = 0
-
-    def reset_botquestions(self) -> None:
-        self.botquestions = []
-
-    def reset_interview(self) -> None:
-        self.last_question = 0
-        self.botquestions = []
 
     def set_script(self, script: Script) -> None:
         all_scripts = {
@@ -175,20 +164,6 @@ class Conversation():
         reply = self.rivebot.reply("localuser", message)
         return reply
 
-    def add_system(self, message: str) -> None:
-        self.messages.append({"role" : "system", "content": message})
-
-    def change_system(self, message: str) -> None:
-        self.messages[0]['content'] = message
-    
-    def reset_system(self) -> None:
-        self.messages = []
-        
-    def add_role_user(self, message: str) -> None:
-        self.messages.append({"role": "user", "content" : message})
-        
-    def add_role_assistant(self, message: str) -> None:
-        self.messages.append({"role" : "assistant", "content" : message})
      
     def get_user_number(self) -> str:
         return self.user_number
@@ -210,40 +185,6 @@ class Conversation():
         
     def set_interval(self, interval: int) -> None:
         self.interval = interval
-
-    def set_persona(self, persona: Persona) -> None:
-        self.persona = persona
-    
-    def set_intro_msg(self, intro_msg: str) -> None:
-        self.intro_msg = intro_msg
-
-    def set_outro_msg(self, outro_msg: str) -> None:
-        self.outro_msg = outro_msg
-    
-    def set_bot_name(self, bot_name: str) -> None:
-        self.bot_name = bot_name
-
-    def set_temperature(self, temperature: float) -> None:
-        self.temperature = temperature
-
-    def set_question_asked(self, question_asked: str) -> None:
-        self.question_asked = question_asked
-
-    def set_personality(self, bot_name: str, conf_section: str, reply_with: str) -> str:
-        self.reset_system()
-        self.set_bot_name(bot_name)
-        self.add_system(cfg[conf_section]['M_S'])
-        self.add_role_user(cfg[conf_section]['M_U'])
-        self.add_role_assistant(cfg[conf_section]['M_A'])  
-        return reply_with
-
-    def get_last_question(self) -> tuple:
-        for i, item in enumerate(self.botquestions):
-            if not item.answer:
-                print("INDEX QUEST: ", i)
-                return (i, len(self.botquestions))
-                break
-        return (len(self.botquestions),len(self.botquestions))
 
     def send_msg(self, message: str) -> Literal['Done']:
         """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
@@ -343,42 +284,6 @@ class Conversation():
         self.free_tries = obj['free_tries']
         return "Done"
     
-    def set_lisa_hrd(self) -> None:
-        self.last_question = 0
-        self.botquestions = []
-        self.persona = Persona.HRD
-
-    def tambah_free_tries(self, jumlah: int = 5):
-        self.free_tries += jumlah
-    
-    def kurangi_profanity_counter(self):
-        self.profanity_counter -= 1
-        if self.profanity_counter < 0:
-            self.profanity_counter = 0
-    
-    def kurangi_funny_counter(self):
-        self.funny_counter -= 1
-        if self.funny_counter < 0:
-            self.funny_counter = 7
-    
-    def kurangi_promo_counter(self):
-        self.promo_counter -= 1
-        if self.promo_counter < 0:
-            self.promo_counter = 7
-    
-    def kurangi_free_tries(self):
-        self.free_tries -= 1
-        if self.free_tries < 0:
-            self.free_tries = 0
-
-    def tambah_paid_messages(self, jumlah: int = 5):
-        self.paid_messages += jumlah
-
-    def kurangi_paid_messages(self) -> None:
-        self.paid_messages -= 1
-        if self.paid_messages < 0:
-            self.paid_messages = 0
-
 
 
 @dataclass

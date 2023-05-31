@@ -1,5 +1,16 @@
 from conversations import Conversation, Message, Persona
 from colorama import Fore, Style, Back
+import persona_func as pf
+import shlex
+from agent1 import ask_lc
+from agent3 import ask_pdf
+from db_oper import insert_conv
+import datetime
+import toml
+import apicall as api
+import asyncio
+
+cfg = toml.load('config.toml')
 
 def eta(conv_obj: Conversation) -> str:
     return f"""Assalamualaikum semua.
@@ -33,19 +44,28 @@ class AdminMemory():
 
 admin_memory = AdminMemory()
 
-def run(conv_obj: Conversation, msg_text: str) -> str:
-    print(f"{Style.BRIGHT}{Fore.CYAN}{msg_text}{Style.RESET_ALL}")
+async def run(msg_proc, conv_obj: Conversation, msg_text: str):
+    print(f"{Style.BRIGHT}{Fore.CYAN}ADMIN COMMAND: {msg_text}{Style.RESET_ALL}")
     if msg_text.lower().startswith('.reset'):
-        conv_obj.set_persona(Persona.ASSISTANT)
-        return conv_obj.set_personality("Maya", "AST", "Hai, Aku Maya, aku akan berusaha membantumu")
+        pf.set_persona(Persona.ASSISTANT, conv_obj)
+        return pf.set_personality("Maya", "ASSISTANT", "Hai, Aku Maya, aku akan berusaha membantumu", conv_obj)
     if msg_text.lower().startswith('.who'):
         persona = conv_obj.persona
-        mode = conv_obj.mode
+        mode = conv_obj.convmode
         return f'saya sekarang adalah {conv_obj.bot_name} dengan persona:{persona}, mode:{mode}'
     if msg_text.lower().startswith('.?'):
         return help()
     if msg_text.lower().startswith('.eta'):
         return eta(conv_obj)
+    if msg_text.lower().startswith('.st'):
+        return f"""ft: {conv_obj.free_tries}
+fg: {conv_obj.free_gpt}
+fc: {conv_obj.funny_counter}
+pm: {conv_obj.paid_messages}
+prs: {conv_obj.persona}
+cm : {conv_obj.convmode}
+ct : {conv_obj.convtype}
+        """
 
     command = msg_text.lower().split(" ")
     match command:
@@ -65,9 +85,56 @@ def run(conv_obj: Conversation, msg_text: str) -> str:
             result = admin_memory.admin_var.keys()
             return f"variabel yg ada : {result}"
 
+    nama_bot = conv_obj.bot_name.lower()
+    awalan = msg_text[:len(nama_bot)].lower()
+    if awalan == nama_bot:
+        msg_text = msg_text[len(conv_obj.bot_name):].strip()
+
+
+    # BOT COMMANDS
+    msgcommand = shlex.split(msg_text.lower())
+    match msgcommand:
+        case ['eta', *rest]:
+            return eta(conv_obj)
+        case ['file', filename]:
+            return f'{filename} is the filename'
+        case ['set', param1, param2]:
+            return f'{param1} is set to {param2}'
+        case ['pdf', *rest]:
+            response = ask_pdf('./BBB.pdf', " ".join(rest))
+            insert_conv(conv_obj.user_number,
+                        conv_obj.bot_number,
+                        int(datetime.datetime.utcnow().timestamp()), 
+                        response, cfg['CONFIG']['DB_FILE'])
+            return response            
+        case ['cari', *rest]:
+            response = ask_lc(" ".join(rest))
+            insert_conv(conv_obj.user_number,
+                        conv_obj.bot_number,
+                        int(datetime.datetime.utcnow().timestamp()), 
+                        response, cfg['CONFIG']['DB_FILE'])
+            return response        
+        # case ['gambar', *rest]:
+        #     print(" ".join(rest))
+        #     response = ask_dalle(conv_obj, " ".join(rest))
+        #     return response
+        case _ :
+            result = await api.ask_gpt(msg_proc, conv_obj, msg_text)
+            insert_conv(conv_obj.user_number,
+                        conv_obj.bot_number,
+                        int(datetime.datetime.utcnow().timestamp()), 
+                        result, cfg['CONFIG']['DB_FILE'])
+            result = f"{result}\n\n\u2764".strip()
+            return result 
+
+
+
 def build_prompt() -> str:
     prompt_build = ""
     for i in range(1,11):
         if str(i) in admin_memory.admin_var:
             prompt_build = f"{prompt_build} {admin_memory.admin_var[str(i)]}" 
     return prompt_build
+
+
+

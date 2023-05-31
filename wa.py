@@ -15,7 +15,9 @@ from datetime import datetime
 import uvicorn
 from colorama import just_fix_windows_console, Fore, Back, Style
 import subprocess
-
+import counting as ct
+import persona_func as pf
+import conv_func as cf
 
 just_fix_windows_console()
 cfg = toml.load('config.toml')
@@ -197,9 +199,20 @@ async def set_content(message_content: MessageContent) -> dict[str, str]:
     if message_content.user_number not in conversations:
         add_conversation(message_content.user_number, message_content.bot_number)
 
-    getattr(conversations[message_content.user_number], roles[message_content.role] )(content)
+    #getattr(conversations[message_content.user_number], roles[message_content.role] )(content)
+    if message_content.role == 'SYSTEM':
+        cf.add_system(conversations[message_content.user_number], content)
+        return {'message' : 'success setting system message'}
+    if message_content.role == "USER":
+        cf.add_role_user(conversations[message_content.user_number], content)
+        return {'message' : 'success setting user message'}
+    if message_content.role == "ASSISTANT":
+        cf.add_role_assistant(conversations[message_content.user_number], content)
+        return {'message': 'success setting assistant message'}
     logging.debug(f"Inject:{message_content.role}:{content} to {message_content.user_number}")
-    return {'message': 'Done'}
+
+    return {"message": "Error setting content"}
+
 
 @app.put('/create_conv/{user_number}/{bot_number}')
 async def create_conv(user_number: str, bot_number: str) -> dict[str, str]:
@@ -273,8 +286,8 @@ async def reset_botquestion(user_number: str) -> dict[str, str]:
 async def reset_channel(user_number: str) -> dict[str, str]:
     if user_number not in conversations:
         return {'detail' : 'user dont exist'}
-    conversations[user_number].set_persona(Persona.ASSISTANT)
-    conversations[user_number].set_personality("Maya", "AST", "Hai, Aku Maya, aku akan berusaha membantumu")
+    pf.set_persona(Persona.ASSISTANT, conversations[user_number])
+    pf.set_personality("Maya", "ASSISTANT", "Hai, Aku Maya, aku akan berusaha membantumu", conversations[user_number])
     return {'message' : 'reset done'}
 
 
@@ -290,14 +303,14 @@ async def change_interval(user_number: str, interval: int) -> dict[str, str]:
 async def tambah_free_tries(user_number: str, unit: int):
     if user_number not in conversations:
         return {'message': 'user does not exist'}
-    conversations[user_number].tambah_free_tries(unit)
+    ct.tambah_free_tries(conversations[user_number], jumlah=unit)
     return {"message": f"user {user_number} sudah di tambah {unit} free tries"}
 
 @app.put("/tambah_paid_messages/{user_number}/{unit}")
 async def tambah_paid_messages(user_number: str, unit: int):
     if user_number not in conversations:
         return {'message': 'user does not exist'}
-    conversations[user_number].tambah_paid_messages(unit)
+    ct.tambah_paid_messages(conversations[user_number],jumlah=unit)
     return {"message": f"user {user_number} sudah di tambah {unit} paid messages"}
 
 # Endpoint untuk memulai menjalankan method pada setiap objek
@@ -323,7 +336,7 @@ async def set_persona(user_number: str, persona: Persona) -> dict[str, str]:
     if user_number not in conversations:
         return {'message': 'user not found'}
     
-    conversations[user_number].set_persona(persona)
+    pf.set_persona(persona, conversations[user_number])
     return {'message' : f'set to {persona}'}
 
 
@@ -398,6 +411,12 @@ async def set_convtype(user_number: str, convtype: ConvType) -> dict[str, str]:
     conversations[user_number].set_convtype(convtype)
     return {'detail' : f'{user_number} set to {convtype}'}
 
+@app.put('/toggle_free_gpt/{user_number}')
+async def toggle_free_gpt(user_number: str):
+    if user_number not in conversations:
+        return {'detail' : 'user dont exist'}
+    cf.toggle_free_gpt(conversations[user_number])
+    return {'detail' : f'done toggle free gpt on {user_number}'}
 
 async def background_task():
     count = 0
