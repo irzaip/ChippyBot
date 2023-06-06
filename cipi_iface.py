@@ -178,6 +178,16 @@ def get_conversations() -> list:
     else:
         raise ValueError
 
+def get_groups() -> list:
+    url = f'http://127.0.0.1:8000/participant'
+    response = requests.get(url)
+    if response.ok:
+        return response.text # type: ignore
+    else:
+        raise ValueError
+
+
+    
 def run_background_task(user_number) -> None:
     url = f'{server_address}/run_background_task/{user_number}'
     response = requests.get(url)

@@ -74,6 +74,7 @@ class MsgProcessor:
 
     async def process(self, conv_obj: Conversation, message: Message) -> Union[str, None, str]:
         """Prosedur ini memproses Terima pesan dari WA"""
+        #ct.pra_proses(conv_obj)
         print( f"{Fore.MAGENTA}ft:{conv_obj.free_tries}, ct:{conv_obj.convtype}, fc:{conv_obj.funny_counter}{Style.RESET_ALL}")
             
         nama_bot = conv_obj.bot_name.lower()
@@ -88,6 +89,11 @@ class MsgProcessor:
             if self.is_admin(message):
                 return await admin.run(self, conv_obj, message.text)
 
+        if "konfirmasi" in message.text.lower():
+            if message.author:
+                await admin.notify_admin(f'konfirmasi signal from group {message.user_number} or {message.author}')
+            else:
+                await admin.notify_admin(f'konfirmasi signal at japrian {message.user_number}')
 
         #abaikan msg group ini
         if (conv_obj.need_group_prefix) and (message.author != '') and ( nama_bot != awalan ):
@@ -97,8 +103,8 @@ class MsgProcessor:
         if awalan == nama_bot:
             message.text = message.text[len(conv_obj.bot_name):].strip()
 
-        #ignore looping error send
-        if message.text.lower().startswith("ada error"):
+        #ignore looping error admin notif send
+        if message.text.lower().startswith("ada error") or message.text.lower().startswith("konfirmasi signal"):
             return None
 
         #

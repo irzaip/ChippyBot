@@ -9,6 +9,7 @@ import datetime
 import toml
 import apicall as api
 import asyncio
+import requests
 
 cfg = toml.load('config.toml')
 
@@ -137,4 +138,23 @@ def build_prompt() -> str:
     return prompt_build
 
 
+async def notify_admin(message: str):
+    for i in cfg['CONFIG']['ADMIN_NUMBER']:
+        result = await send_to_phone(i, cfg['CONFIG']['BOT_NUMBER'], message)
+    return result
+
+async def send_to_phone(user_number: str, bot_number: str, message: str):
+    """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
+    message = {
+        "message": message, # Replace with your message text
+        "from": bot_number, # Replace with the sender number
+        "to": user_number # Replace with out bot number
+    } # type: ignore
+
+    response = requests.post(cfg['WHATSAPP']['SEND_URL'], json=message)
+
+    if response.status_code == 200:
+        return "Message sent successfully!"
+    else:
+        return f"Error sending message. Status code: {response.status_code}"
 

@@ -132,6 +132,9 @@ class Conversation():
         self.daily_free_gpt = 3
         self.paid_messages = 0
         self.rivebot = RiveScript()
+        self.anti_flood = []
+        self.max_promo = 5
+        self.max_funny = 7
         # self.rivebot.load_directory('./rive/brain')
         # self.rivebot.sort_replies()
         self.set_script(self.script)        

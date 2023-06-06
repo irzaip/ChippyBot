@@ -2,7 +2,33 @@
 import gradio as gr
 import cipi_iface as cp
 from conversations import Persona, Script, ConvMode, ConvType, Role
+import json
+import requests
+import toml
 
+cfg = toml.load('config.toml')
+
+theme = gr.themes.Soft(
+    primary_hue="stone",
+    secondary_hue="cyan",
+)
+
+# theme = 'gradio/seafoam'
+
+def send_to_phone(user_number: str, bot_number: str, message: str):
+    """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
+    message = {
+        "message": message, # Replace with your message text
+        "from": bot_number, # Replace with the sender number
+        "to": user_number # Replace with out bot number
+    } # type: ignore
+
+    response = requests.post(cfg['WHATSAPP']['SEND_URL'], json=message)
+
+    if response.status_code == 200:
+        return "Message sent successfully!"
+    else:
+        return f"Error sending message. Status code: {response.status_code}"
 
 def get_conv_(user_filter: str):
     all_conv = cp.get_conversations()
@@ -14,6 +40,15 @@ def get_conv_(user_filter: str):
         if user_filter in i:
             result.append(i)
     return gr.Dropdown.update(choices=result)
+
+def get_groups_(user_filter: str):
+    all_groups = json.loads(cp.get_groups())  # type: ignore
+    result = []
+    for i in all_groups:
+        if user_filter in i['group_name']:
+            result.append(f"{i['group_id']}###{i['group_name']}")
+    return gr.Dropdown.update(choices=result)
+
 
 conversations = {}
 
@@ -91,11 +126,13 @@ def main():
         un = user_number.split('###')[0].strip()
         response = cp.reset_channel(un)
     
-    with gr.Blocks() as admin:
+    with gr.Blocks(theme=theme) as admin:
         with gr.Row():
             contacts = gr.Dropdown(choices=all_conv, label="Contact Number / Group", interactive=True)
             refresh_contact = gr.Button(value="Refresh", interactive=True)
             refresh_contact.style(size='sm', full_width=False)
+            refresh_group = gr.Button(value="Get Groups", interactive=True)
+            refresh_group.style(size='sm', full_width=False)
 
             retrieve_data = gr.Button(value="Retrieve Data")
             retrieve_data.style(size='sm', full_width=False)
@@ -180,6 +217,7 @@ def main():
 
         #definisi klik
         refresh_contact.click(fn=get_conv_, inputs=user_filter, outputs=contacts)
+        refresh_group.click(fn=get_groups_, inputs=user_filter, outputs=contacts)
         reset_ch.click(fn=reset_channel_, inputs=contacts)
         retrieve_data.click(fn=_conversation_info, inputs=contacts, outputs=[json_msg, sys_msg, user_msg,assistant_msg, interval, persona, convmode, intro_msg, outro_msg, bot_name, user_name])
         st_convtype.click(fn=set_convtype_ , inputs=[contacts, convtype])
@@ -193,8 +231,9 @@ def main():
         assistant_set.click(fn=set_assistant_, inputs=[contacts, assistant_msg])
         toggle_free_gpt.click(fn=toggle_free_gpt_, inputs=[contacts])
         
-    admin.launch(server_port=9666, share=True)
-
+    result = admin.launch(server_port=9666, share=True,)
+    print(result)
+    send_to_phone(cfg['CONFIG']['UJI_COBA'], cfg['CONFIG']['BOT_NUMBER'], message=result)
 
 if __name__ == '__main__':
     main()

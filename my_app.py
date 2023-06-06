@@ -79,7 +79,7 @@ cp.set_message(un, m_s, Role.SYSTEM)
 cp.set_message(un, m_u, Role.USER)
 cp.set_message(un, m_a, Role.ASSISTANT)
 
-cp.set_mode(un, cm)
+cp.set_convmode(un, cm)
 
 cp.set_interval(un, 3000)
 

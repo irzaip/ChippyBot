@@ -60,14 +60,16 @@ if sys.version_info < (3, 10):
     print("Tak bisa jalan di python < 3.10")
     sys.exit()
 
-def notify_admin(message: str) -> None:
-    send_to_phone(cfg['CONFIG']['ADMIN_NUMBER'][0], cfg['CONFIG']['BOT_NUMBER'], message)
+async def notify_admin(message: str) -> None:
+    for i in cfg['CONFIG']['ADMIN_NUMBER']:
+        result = send_to_phone(i, cfg['CONFIG']['BOT_NUMBER'], message)
+    return print(result)
 
 def generate_filename() -> str:
     chars = string.ascii_lowercase + string.digits
     return ''.join(random.choice(chars) for _ in range(10))
  
-def send_to_phone(user_number: str, bot_number: str, message: str) -> None:
+def send_to_phone(user_number: str, bot_number: str, message: str):
     """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
     message = {
         "message": message, # Replace with your message text
@@ -78,11 +80,9 @@ def send_to_phone(user_number: str, bot_number: str, message: str) -> None:
     response = requests.post(whatsapp_web_url, json=message)
 
     if response.status_code == 200:
-        print("Message sent successfully!")
+        return "Message sent successfully!"
     else:
-        print(f"Error sending message. Status code: {response.status_code}")
-        print(response.text)
-
+        return f"Error sending message. Status code: {response.status_code}"
 
 def reformat_phone(text: str) -> str:
     """Ambil hanya nomor telfon saja, tanpa ending @c.us"""
@@ -158,7 +158,7 @@ async def receive_message(message: Message) -> dict[str, str] | str:
                 return {'data': 'none'}
         except Exception as err:
             print(f"{Fore.RED}{Back.WHITE}>>>>>>>>>>>>>>>> ERROR : " + f"{str(err)} <<<<<<<<<<<<<<<<<<<<<{Fore.WHITE}{Back.BLACK}")
-            await asyncio.to_thread(notify_admin(f"Ada error {str(err)} nih!")) # type: ignore
+            result = await notify_admin(f"Ada error {str(err)} nih! dari {message.user_number}") # type: ignore
             return {"message" : return_brb()}
 
         update_db_connection(user_number=message.user_number, bot_number=message.bot_number, result=conversation_obj.get_params(), db_name='cipibot.db')
@@ -449,5 +449,6 @@ async def startup_event():
 #subprocess.run(["python", "startup_script.py"])
 
 if __name__ == "__main__":
+
     uvicorn.run(app, host="0.0.0.0", port=8998)
 
