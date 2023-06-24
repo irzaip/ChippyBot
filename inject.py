@@ -1,7 +1,7 @@
 ## send to api whatsapp-web.js open port
 from enum import Enum, auto
 import requests
-from conversations import Role, Message, InjectedMessage, MessageContent, Conversation
+from conversations import Role, Conversation
 
 
 def set_message(user_number, message, role: Role):

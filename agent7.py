@@ -46,7 +46,7 @@ def agent_liza(obj: Conversation, prompt: str) -> str:
         max_iteration=3,
         early_stopping_method='generate',
         memory=memory,
-        SystemMessagePromptTemplate = sys_prompt,
+        SystemMessagePromptTemplate = sys_prompt, 
     )
 
     return lisa(prompt)['output']

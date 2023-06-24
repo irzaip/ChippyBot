@@ -1,21 +1,21 @@
 #ADMIN FRONT END
 import gradio as gr
+
 import cipi_iface as cp
 from conversations import Persona, Script, ConvMode, ConvType, Role
 import json
 import requests
 import toml
+import db_oper as db
 
 cfg = toml.load('config.toml')
 
-theme = gr.themes.Soft(
-    primary_hue="stone",
-    secondary_hue="cyan",
-)
+
+
 
 # theme = 'gradio/seafoam'
 
-def send_to_phone(user_number: str, bot_number: str, message: str):
+def send_to_phone(user_number: str, message: str, bot_number: str = cfg['CONFIG']['BOT_NUMBER'] ):
     """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
     message = {
         "message": message, # Replace with your message text
@@ -26,13 +26,16 @@ def send_to_phone(user_number: str, bot_number: str, message: str):
     response = requests.post(cfg['WHATSAPP']['SEND_URL'], json=message)
 
     if response.status_code == 200:
+        print("OK sent")
         return "Message sent successfully!"
+    
     else:
         return f"Error sending message. Status code: {response.status_code}"
 
 def get_conv_(user_filter: str):
     all_conv = cp.get_conversations()
-    print(all_conv)
+    #print(all_conv)
+    print("Get Conversations")
     all_conv = cp.json.loads(all_conv) # type: ignore
     all_conv = list(all_conv['message'])
     result = []
@@ -41,14 +44,21 @@ def get_conv_(user_filter: str):
             result.append(i)
     return gr.Dropdown.update(choices=result)
 
+# def get_groups_(user_filter: str):
+#     all_groups = json.loads(cp.get_groups())  # type: ignore
+#     result = []
+#     for i in all_groups:
+#         if user_filter in i['group_name']:
+#             result.append(f"{i['group_id']}###{i['group_name']}")
+#     return gr.Dropdown.update(choices=result)
+
 def get_groups_(user_filter: str):
-    all_groups = json.loads(cp.get_groups())  # type: ignore
+    all_groups = db.get_all_participant('cipibot.db')
     result = []
     for i in all_groups:
-        if user_filter in i['group_name']:
-            result.append(f"{i['group_id']}###{i['group_name']}")
+        if user_filter in i[1]:
+            result.append(f'{i[0]}###{i[1]}')
     return gr.Dropdown.update(choices=result)
-
 
 conversations = {}
 
@@ -57,17 +67,28 @@ def get_user_number(user_number: str) -> str:
 
 
 def main():
+
+    theme = gr.themes.Monochrome(
+        primary_hue=gr.themes.colors.orange ,
+        secondary_hue=gr.themes.colors.blue,
+        neutral_hue=gr.themes.colors.stone, 
+        )
+
     all_conv = []
     persona = [e.name for e in Persona]
     convmode = [e.name for e in ConvMode]
     script = [e.name for e in Script]
     convtype = [e.name for e in ConvType]
+    say_this_c = [m for m in cfg['SAY']['SAY_MSG']]
 
     def toggle_maintenance_() -> None:
         cp.set_maintenance()
 
     def clean_(user_number: str):
         return user_number.split('###')[0].strip()
+    
+    def stp(user_number: str, message: str):
+        return send_to_phone(clean_(user_number), message)
     
     def set_system_(user_number: str, message: str):
         cp.set_message(user_number=user_number, message=message, role=Role.SYSTEM)
@@ -126,7 +147,7 @@ def main():
         un = user_number.split('###')[0].strip()
         response = cp.reset_channel(un)
     
-    with gr.Blocks(theme=theme) as admin:
+    with gr.Blocks(theme="gstaff/whiteboard") as admin:
         with gr.Row():
             contacts = gr.Dropdown(choices=all_conv, label="Contact Number / Group", interactive=True)
             refresh_contact = gr.Button(value="Refresh", interactive=True)
@@ -204,7 +225,7 @@ def main():
             set_questions = gr.Button(value="Set Questions")
 
         with gr.Row():
-            say_this = gr.Textbox(label="hehe..", interactive=True)
+            say_this = gr.Dropdown(choices=say_this_c, interactive=True, label="Say This to user", allow_custom_value=True)
             say_btn = gr.Button(value="Say", interactive=True)
             say_btn.style(size='sm', full_width=False)
 
@@ -230,8 +251,9 @@ def main():
         user_set.click(fn=set_user_, inputs=[contacts, user_msg])
         assistant_set.click(fn=set_assistant_, inputs=[contacts, assistant_msg])
         toggle_free_gpt.click(fn=toggle_free_gpt_, inputs=[contacts])
-        
-    result = admin.launch(server_port=9666, share=True,)
+        say_btn.click(fn=stp, inputs=[contacts, say_this])
+
+    result = admin.launch(server_name = "0.0.0.0", server_port=9666, share=True,)
     print(result)
     send_to_phone(cfg['CONFIG']['UJI_COBA'], cfg['CONFIG']['BOT_NUMBER'], message=result)
 

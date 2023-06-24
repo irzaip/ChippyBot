@@ -10,6 +10,7 @@ import toml
 import apicall as api
 import asyncio
 import requests
+import sd_agent as sd
 
 cfg = toml.load('config.toml')
 
@@ -44,6 +45,15 @@ class AdminMemory():
 
 
 admin_memory = AdminMemory()
+
+def set_sys_var(var: str, rest):
+    setvar = var
+    value = ""
+    for i in rest:
+        value = f"{value} {i}"
+    admin_memory.admin_var[str(setvar)] = value.strip()
+    return f"Done setting {str(setvar)} !"
+
 
 async def run(msg_proc, conv_obj: Conversation, msg_text: str):
     print(f"{Style.BRIGHT}{Fore.CYAN}ADMIN COMMAND: {msg_text}{Style.RESET_ALL}")
@@ -84,7 +94,45 @@ ct : {conv_obj.convtype}
                 return f"isi {var} tidak ada!"
         case [".list"]:
             result = admin_memory.admin_var.keys()
-            return f"variabel yg ada : {result}"
+            return f"variabel yg ada : {result}"        
+        case [".sd", *rest]:
+            return sd.buat_gambar(prompt=" ".join(rest))
+        
+        case [".1", *rest]:
+            return set_sys_var('_s1', rest)
+        case [".2", *rest]:
+            return set_sys_var('_s2', rest)
+        case [".3", *rest]:
+            return set_sys_var('_s3', rest)
+        case [".4", *rest]:
+            return set_sys_var('_s4', rest)
+        case [".5", *rest]:
+            return set_sys_var('_s5', rest)
+        case [".6", *rest]:
+            return set_sys_var('_s6', rest)
+        case [".7", *rest]:
+            return set_sys_var('_s7', rest)
+        case [".8", *rest]:
+            return set_sys_var('_s8', rest)
+        case [".9", *rest]:
+            return set_sys_var('_s9', rest)
+        case [".10", *rest]:
+            return set_sys_var('_s10', rest)
+        case [".11", *rest]:
+            return set_sys_var('_s11', rest)
+        case [".12", *rest]:
+            return set_sys_var('_s12', rest)
+        case [".13", *rest]:
+            return set_sys_var('_s13', rest)
+        case [".14", *rest]:
+            return set_sys_var('_s14', rest)
+        case [".15", *rest]:
+            return set_sys_var('_s15', rest)
+        case ["..", *rest]:
+            msg_text = build_from_sysvars(" ".join(rest))
+            result = await api.ask_gpt(msg_proc, conv_obj, msg_text)
+            result = f"{result}\n\n\U0001F4CA".strip()
+
 
     nama_bot = conv_obj.bot_name.lower()
     awalan = msg_text[:len(nama_bot)].lower()
@@ -121,10 +169,6 @@ ct : {conv_obj.convtype}
         #     return response
         case _ :
             result = await api.ask_gpt(msg_proc, conv_obj, msg_text)
-            insert_conv(conv_obj.user_number,
-                        conv_obj.bot_number,
-                        int(datetime.datetime.utcnow().timestamp()), 
-                        result, cfg['CONFIG']['DB_FILE'])
             result = f"{result}\n\n\u2764".strip()
             return result 
 
@@ -137,6 +181,15 @@ def build_prompt() -> str:
             prompt_build = f"{prompt_build} {admin_memory.admin_var[str(i)]}" 
     return prompt_build
 
+def build_from_sysvars(prompt):
+    syslist = ['_s1', '_s2','_s3','_s4','_s5','_s6','_s7','_s8','_s9','_s10','_s11','_s12','_s13','_s14','_s15',]
+    result = ""
+    for i in syslist:
+        try:
+            result = result + admin_memory.admin_var[i] + "\n\n"
+        except:
+            pass
+    return f"{prompt}\n\n{result}"
 
 async def notify_admin(message: str):
     for i in cfg['CONFIG']['ADMIN_NUMBER']:

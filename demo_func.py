@@ -1,4 +1,4 @@
-from conversations import Conversation, ConvMode, Message
+from conversations import Conversation, ConvMode, Message, Persona
 from colorama import Fore, Style, Back
 import toml
 import random
@@ -8,6 +8,7 @@ import datetime
 from db_oper import insert_conv
 import asyncio
 import interview as iv
+import agent1 as ag1
 
 cfg = toml.load('config.toml')
 
@@ -48,19 +49,28 @@ async def run(self, conv_obj: Conversation, message: Message):
 
     promo = random.choice(cfg['IKLAN']['PROMO'])
 
+    #buat vold, gak perlu memory
+    if conv_obj.persona == Persona.VOLD:
+        memory = False
+    else:
+        memory = True
+
     if conv_obj.convmode == ConvMode.INTERVIEW:
         remove_flood()
         return iv.get_answer(conv_obj, message)
 
+    if msg_text.startswith('carikan'):
+        result = ag1.ask_lc(msg_text)
+        remove_flood()
+        return result
 
     if conv_obj.free_tries:
         ct.kurangi_free_tries(conv_obj)
-        result = await api.ask_gpt(self, conv_obj, msg_text)
-        insert_conv(conv_obj.user_number,
-                    conv_obj.bot_number,
-                    int(datetime.datetime.utcnow().timestamp()), 
-                    result, cfg['CONFIG']['DB_FILE'])
-        result = f"{result}\n\n*[{conv_obj.free_tries}]*\u2713".strip()
+        letih = ""
+        if conv_obj.free_tries == 0:
+            letih = random.choice(cfg['IKLAN']['LETIH'])
+        result = await api.ask_gpt(self, conv_obj, msg_text, memory=memory)
+        result = f"{letih}{result}\n\n*[{conv_obj.free_tries}]*\u2713".strip()
         remove_flood()
         return result 
 
@@ -81,10 +91,6 @@ async def run(self, conv_obj: Conversation, message: Message):
         ct.kurangi_promo_counter(conv_obj)
         pesan = random.choice(cfg['IKLAN']['PESAN'])
         result = await api.ask_ooba(self, conv_obj, msg_text)
-        insert_conv(conv_obj.user_number,
-                    conv_obj.bot_number,
-                    int(datetime.datetime.utcnow().timestamp()), 
-                    result, cfg['CONFIG']['DB_FILE'])
         remove_flood()
         if not conv_obj.promo_counter:
             return f'{result}\n{pesan}\n{promo}'

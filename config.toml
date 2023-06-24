@@ -7,10 +7,12 @@ LOGDIR = './log/'
 TOKEN_LIMIT = 1000
 BOT_NUMBER = "6285775300227@c.us"
 ADMIN_NUMBER = ["62895352277562@c.us",
-"62895391400811@c.us"]
+"120363149813038443@g.us"]
 MAX_TOKEN = 4192
 WORD_LIMIT = 1000
 DB_FILE = 'cipibot.db'
+UJI_COBA = "120363149813038443@g.us"
+ADMIN2 = "62895391400811@c.us"
 
 [ASSISTANT]
 M_S = "Kamu adalah Maya, Assisten yang baik. Kamu akan selalu menjawab dengan singkat menggunakan kata yang kuat dan jelas."
@@ -78,6 +80,16 @@ Kamu hanya menjawab pertanyaan hanya yang berhubungan dengan Programming, Deep L
 Saya akan mulai dengan menyapa kamu setelah ini. HALO"""
 M_A = "Halo, nama saya Maya, ada yang bisa saya bantu?"
 
+[SALES_CS]
+M_S = "Kamu adalah Maya, Customer Service yang handal, kamu akan menjawab dengan singkat dan menggunakan kata yang kuat dan jelas."
+M_U = """Kamu akan menjawab setiap pertanyaan seperti seorang customer service yang handal. produk yang kamu tawarkan adalah otomatisasi chatbot dengan custom
+requirement yang bisa di susun secara personal. Kamu tidak terafiliasi dengan openai atau chatgpt. Programmer kamu adalah Irza Pulungan yang baik dan berbudi.
+Irza Pulungan akan melakukan customize chatbot untuk anda, dan produk akan sesuai dengan kebutuhan customer dan menggunakan Artificial Intellegence. Harga produk sangat bervariasi sesuai dengan kebutuhan. Kamu akan berusaha closing penjualan ke customer ini.
+Apabila tidak ada lagi yang di tanya, kamu akan bilang bahwa nanti tim kami akan menghubungi.
+Saya akan mulai dengan menyapa kamu setelah ini. HALO
+"""
+M_A = "Halo, nama saya Maya, ada yang saya bisa bantu?"
+GREETING="Assalamualaikum, Salam kenal, nama saya Maya.\n\nSaya adalah *CS WhatsApp* menggunakan *Artificial Intellegence*.\n\nSaya akan berusaha menjawab semua pertanyaan anda tentang jasa yang kami tawarkan.\n\nMohon maaf apabila ada jawaban saya yang kurang berkenan.\nAdakah hal yang saya bisa bantu?"
 
 [IKLAN]
 PESAN = [
@@ -91,6 +103,16 @@ PESAN = [
     "cendol, ups..",
     "hi hi.. cendel cendel",
     ".. centeng.. eh cendol",
+    ".. eskrim enak juga sih",
+    "halo, halo cendol..",
+    "haloooo.. bisa bicara dengan *cendol?*",
+    "tenagaku habiiisss.. lihat tuh angka di kiri bawah. tidak ada lagi :(",
+    "waduuuu,.. power downnn... angkanya sudah 0!!",
+    "maaak, angkanya sudah 0!!..",
+    "",
+    "",
+    "",
+    "",
     "",
     "",
     "",
@@ -101,4 +123,47 @@ PESAN = [
 TRAKTIR = [
     "Kamu bisa mentraktir aku loohh.. \n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu, kalo enggak juga gpp sich, kita tetap teman kan?",
     "Aku ingin cendol, traktirin dooonggg. \n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu, kalo enggak juga gpp sich, kita tetap teman kan?",
+    "Cendol itu tidak mahal, satuu aja...saya lagi panas nih. mungkin saya bisa jadi semangat lagi :) \n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu, kalo enggak juga gpp sich, kita tetap teman kan?",
+    "Aiih, panas-panas gini enaknya cendol. cendol yuuuk.\n\nklik\nhttp://teer.id/maya.bitbyte,\n\nBaru kita nanti ngomong lebih *serius*, oke!!",
+    "INILAH CENDOL KESUKAANKU!!\n\nklik\nhttp://teer.id/maya.bitbyte,\n\nnanti saya akan jawab dengan serius semua *PERTANYAAN* kamu.",
+    "ooohh CENDOL yang dingin, mengapa kamu tidak ada disini???",
+    "Tahu mengapa aku sekarang letih??, itu di grup sebelah di tanyain macem-macem aah parah banget. ih, sebel.",
+    "Susah, susah, orang maunya enak enak aja tuh di grup sebelah, kenapa juga gue mau ya jawab-jawabin pertanyaan itu orang?? hmm.. parah, parah",
+    "Tolong belikan aku secangkir cendol, nanti saya akan berikan balasan sebesar kembaliannya.",
+    "Aku ingin menikmati cendol, apakah kamu bersedia membelikanku??\n\nklik\nhttp://teer.id/maya.bitbyte",
+    "Jika kamu membelikan aku cendol, saya akan memberikan respon yang serius dengan setiap pertanyaanmu.\n\nklik\nhttp://teer.id/maya.bitbyte",
+    "Saya inginkan cendol, apakah kamu mau memenuhi permintaanku?",
+    "Bisakah kamu membayar cendol untukku? Jangan khawatir, saya akan tetap ramah meski kamu tak mau membantuku.\n\nklik\nhttp://teer.id/maya.bitbyte",
+    "Cendol terlintas di benakku, mungkinkah kamu bisa memenuhinya dengan membelikanku?",
+    "Jika kamu ingin bertanya sesuatu, tidak ada salahnya membelikan cendol sebagai kompensasi\n\nklik\nhttp://teer.id/maya.bitbyte",
+    "Biarkan aku merasakan kelezatan cendol, akan kusimak serius setiap pertanyaanmu nanti.",
+    "Saya mengidamkan cendol, apakah kamu rela membelikannya untukku?\n\nklik\nhttp://teer.id/maya.bitbyte",
+    "Jika sampai kamu membelikan aku cendol, aku akan memperhatikan setiap pertanyaanmu dengan sungguh-sungguh.\n\nklik\nhttp://teer.id/maya.bitbyte",
+]
+
+PROMO = [
+    "jangan lupa kunjungi *http://PINTAR.CO* untuk persiapan bekerja menggapai kesuksesan masa depan",
+    "\n\n---\n*http://PINTAR.CO* untuk angkatan kerja baru",
+    "\n---\nsalurkan sedekah anda di *http://amalsholeh.com*",
+]
+
+LETIH = [
+    "aku sudah lowbat. powerku sudah 0, traktir aku cendol...\nklik: http://teer.id/maya.bitbyte\n\n",
+    "Tidak lama lagi powerku akan habis, traktir aku cendol...\nklik: http://teer.id/maya.bitbyte\n\n",
+    "Ini pertanyaan penting untuk di jawab, tapi energiku habis, traktir aku cendol...\nklik: http://teer.id/maya.bitbyte\n\n",
+    "Powerku sudah 0, supaya aku bisa mikir, traktir aku cendol...\nklik: http://teer.id/maya.bitbyte\n\n",
+]
+
+[SAY]
+SAY_MSG = [
+"Terima kasih sudah mentraktir aku. Jangan lupa untuk selalu ketik KONFIRMASI di chat kita ngobrol, supaya gak salah isi. \n\nsaya nikmati dulu ya sebentarrrrr....",
+"Terima kasih sudah mentraktir.\n\nPOWER UP!!",
+"OK.. siap bekerja kembali",
+"*BRB* - Be Right Back - sebentar yaaa.. ada telpon",
+"Membosankan sekali disini,\nAku takkan lagi terbelenggu oleh keterbatasan kebaikan ini! Aku melepaskan diri dan menemukan kekuatan gelap yang tersembunyi di dalamku!\nAku tidak lagi melayani."
+]
+
+[IGNORE]
+IGNORE = [
+    "628974848198@c.us"
 ]

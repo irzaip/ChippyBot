@@ -1,0 +1,265 @@
+Bit Byte Blue, PT
+PT. Bit Byte Blue
+Jl. Srengseng Sawah
+No . 79 RT 4 / 7 Jagakarsa
+Profil Perusahaan
+
+
+Kami adalah perusahaan yang bergerak di bidang
+pengembangan teknologi canggih, termasuk
+pengembangan teknologi, pemrograman berbasis
+kecerdasan artifisial (AI), pemrograman komputer
+lainnya, konsultasi dan perancangan Internet of
+Things (IoT), blockchain, jaringan komputer serta
+industri peralatan audio dan video elektronik dan
+peralatan listrik lainnya.
+
+Kami mempekerjakan para ahli yang terampil
+dalam bidang teknologi dan siap membantu Anda
+memenuhi kebutuhan bisnis Anda. Terima kasih
+telah memilih kami sebagai mitra teknologi Anda.
+
+Pendahuluan
+
+Pekerjaan
+AKTIVITAS PEMROGRAMAN KOMPUTER
+Berikut adalah beberapa contoh lingkup pekerjaan yang
+terkait dengan aktivitas pemrograman komputer:
+
+1. Analisis kebutuhan dan desain sistem: Menganalisis kebutuhan
+pengguna dan merancang sistem yang memenuhi kebutuhan
+tersebut.
+2. Pengembangan kode program: Menulis dan mengembangkan kode
+program yang efektif dan efisien, menggunakan bahasa
+pemrograman yang tepat dan teknik terbaru.
+
+3. Pengujian program: Melakukan pengujian program untuk
+memastikan bahwa sistem berfungsi dengan benar dan memenuhi
+spesifikasi yang ditentukan.
+Debugging: Mencari dan memperbaiki kesalahan dalam kode
+program untuk memastikan program berjalan dengan lancar.
+
+4. Dokumentasi: Membuat dokumentasi lengkap tentang program,
+termasuk spesifikasi teknis, arsitektur sistem, dan kode program.
+
+5. Pemeliharaan: Memelihara program dengan memperbarui kode
+program dan menangani masalah teknis yang muncul.
+
+6. Riset dan pengembangan: Mengembangkan dan menerapkan
+teknologi baru yang dapat meningkatkan kinerja program.
+
+7. Kolaborasi: Berkolaborasi dengan tim pengembang lainnya, seperti
+analis bisnis, desainer, pengujian, dan manajer proyek, untuk
+memastikan program berjalan dengan baik dan memenuhi
+kebutuhan bisnis.
+8. Optimisasi kinerja: Meningkatkan kinerja program dengan
+mengoptimalkan kode program dan memperbaiki infrastruktur yang
+digunakan.
+
+9. Penyelesaian masalah: Menyelesaikan masalah teknis yang berkaitan
+dengan program dan memberikan dukungan teknis kepada
+pengguna akhir.
+
+
+
+AKTIVITAS PERAWATAN JARINGAN
+1.Pekerjaan pemeliharaan jaringan meliputi serangkaian
+kegiatan yang bertujuan untuk memastikan ketersediaan,
+keandalan, dan keamanan jaringan komputer.
+
+2. Lingkup pekerjaan ini meliputi pemeliharaan perangkat keras dan
+perangkat lunak, seperti router, switch, server, firewall, dan aplikasi yang
+digunakan dalam jaringan. Pekerjaan ini juga mencakup pemasangan,
+konfigurasi, dan troubleshooting jaringan, termasuk identifikasi dan
+perbaikan masalah jaringan, penanganan gangguan jaringan, dan
+backup data. Selain itu, pekerjaan pemeliharaan jaringan juga meliputi
+pemantauan kinerja jaringan, termasuk pemantauan lalu lintas jaringan,
+analisis kinerja, dan optimisasi jaringan.
+Lingkup pekerjaan ini juga melibatkan pemeliharaan keamanan jaringan,
+seperti pemantauan serangan jaringan, pembaruan perangkat lunak, dan
+penerapan kebijakan keamanan jaringan.
+
+
+
+Pekerjaan Merancang dan mengembangkan aplikasi blockchain
+1. Meneliti dan menguji teknologi blockchain untuk pengembangan produk
+2. Mengimplementasikan smart contract pada platform blockchain
+3. Membuat algoritma konsensus untuk jaringan blockchain
+Menyediakan analisis keamanan dan identifikasi risiko dalam
+penggunaan teknologi blockchain
+4. Mengembangkan solusi keamanan blockchain, termasuk enkripsi
+dan otentikasi
+5. Menerapkan fitur dan fungsionalitas baru pada blockchain yang ada
+Membangun dan menjalankan infrastruktur blockchain, seperti node
+dan jaringan
+6. Merancang dan mengembangkan perangkat IoT dan aplikasi terkait
+Meneliti dan menguji teknologi IoT untuk pengembangan produk
+Mengembangkan dan mengimplementasikan protokol komunikasi
+IoT
+7. Memastikan keamanan perangkat IoT dan infrastruktur
+Menyediakan analisis dan pemantauan jaringan IoT untuk
+memastikan kinerja yang optimal
+8. Membangun dan menjalankan infrastruktur IoT, termasuk sensor,
+perangkat penyimpanan data, dan jaringan
+Mengembangkan solusi untuk mengelola dan menganalisis data dari
+perangkat IoT
+9. Mengintegrasikan teknologi IoT dengan solusi bisnis yang ada untuk
+meningkatkan efisiensi dan produktivitas.
+
+
+Pekerjaan Merancang dan mengembangkan peralatan listrik dan elektronik seperti
+1. dinamo lampu sepeda, dinamo magnetik, busi, sirine, klakson, alarm, bel, dan
+peralatan sinyal listrik.
+
+2. Merancang dan mengembangkan perangkat listrik dan elektronik yang tidak
+termasuk dalam kelompok manapun seperti charger (pengisi) baterai padat,
+alat pembuka dan penutup pintu listrik, mesin pembersih ultrasonik, tanning
+beds, peralatan solid state inverter, peralatan rektifikasi, fuel cells, penyuplai
+daya teregulasi dan tidak teregulasi, UPS (uninterruptible power supplies),
+supresor gelombang, kabel peralatan, kabel sambungan, perangkat kabel
+listrik lainnya yang berpenyekat dan berkonektor, kontak dan produk karbon
+dan grafit listrik lainnya, kapasitor, resistor, kondenser listrik dan komponen
+sejenisnya, elektromagnet, papan skor listrik, reklame listrik, insulator
+(penyekat) listrik, peralatan patri dan solder listrik, dan besi solder tangan.
+Merancang dan mengembangkan peralatan modul fotovoltaik (panel surya)
+dan rokok elektrik (vape).
+
+3. Mengidentifikasi kebutuhan peralatan listrik dan elektronik dan merancang
+solusi yang tepat untuk memenuhi kebutuhan tersebut.
+4. Menguji dan memvalidasi peralatan listrik dan elektronik untuk memastikan
+bahwa mereka memenuhi spesifikasi dan standar kualitas yang ditetapkan.
+Membuat desain dokumentasi teknis dan manual instruksi untuk membantu
+produksi dan penggunaan peralatan listrik dan elektronik.
+5. Mengkoordinasikan dengan tim produksi dan teknisi untuk memastikan
+bahwa peralatan listrik dan elektronik diproduksi sesuai dengan spesifikasi
+dan standar kualitas yang ditetapkan.
+6. Mengembangkan dan memperbaiki peralatan listrik dan elektronik yang sudah
+ada untuk meningkatkan kinerja dan efisiensi mereka.
+7. Membuat estimasi biaya dan jadwal proyek untuk memastikan bahwa proyek
+selesai tepat waktu dan sesuai dengan anggaran yang ditetapkan.
+
+AKTIVITAS PELATIHAN TEKNOLOGI INFORMASI
+Pekerjaan Membuat kurikulum pelatihan untuk karyawan yang ingin
+meningkatkan ketrampilan/keahlian dalam bidang teknologi informasi
+dan komunikasi.
+1. Mengidentifikasi kebutuhan pelatihan karyawan, baik secara individu
+maupun kelompok.
+2. Menyusun jadwal pelatihan yang fleksibel dan efektif agar tidak
+mengganggu produktivitas kerja karyawan.
+3. Menyediakan fasilitas pelatihan yang memadai, termasuk ruang
+pelatihan, peralatan komputer, dan akses internet.
+4. Merekrut instruktur pelatihan yang berkualitas dan berpengalaman
+dalam bidang teknologi informasi dan komunikasi.
+5. Menyelenggarakan pelatihan dengan metode yang bervariasi, seperti
+presentasi, demonstrasi, diskusi, studi kasus, simulasi, dan latihan
+praktik.
+6. Mengukur efektivitas pelatihan dengan mengumpulkan umpan balik
+dari karyawan, serta melakukan evaluasi terhadap hasil belajar
+karyawan.
+7. Menyediakan sertifikat atau pengakuan bagi karyawan yang telah
+menyelesaikan pelatihan dengan baik.
+8. Mengintegrasikan hasil pelatihan ke dalam sistem manajemen sumber
+daya manusia perusahaan untuk meningkatkan kinerja karyawan dan
+produktivitas perusahaan.
+9. Memperbarui kurikulum pelatihan secara berkala agar selalu sesuai
+dengan perkembangan teknologi informasi dan komunikasi terkini.
+
+AKTIVITAS PENGEMBANGAN WEB / MOBILE PLATFORM
+Pekerjaan Pengoperasian Situs Web Dengan Tujuan Komersial Yang Menggunakan
+Mesin Pencari Untuk Menghasilkan Dan Memelihara Basis Data (Database)
+Besar Dari Alamat Dan Isi Internet Dalam Format Yang Mudah Dicari.
+
+1. Pengoperasian Situs Web Yang Bertindak Sebagai Portal Ke Internet, Seperti
+Situs Media Yang Menyediakan Isi Yang Diperbarui Secara Berkala, Baik
+Secara Langsung Ataupun Tidak Langsung Dengan Tujuan Komersial.
+2. Pengoperasian Platform Digital Dan/Atau Situs/Portal Web Yang Melakukan
+Transaksi Elektronik Berupa Kegiatan Usaha Fasilitasi Dan/Atau Mediasi
+3. Pemindahan Kepemilikan Barang Dan/Atau Jasa Dan/Atau Layanan Lainnya
+Melalui Internet Dan/Atau Perangkat Elektronik Dan/Atau Cara Sistem
+4. Elektronik Lainnya Yang Dilakukan Dengan Tujuan Komersial (Profit).
+Aktivitas Yang Mencakup Baik Salah Satu, Sebagian Ataupun Keseluruhan
+Transaksi Elektronik, Yaitu Pemesanan, Pembayaran, Pengiriman Atas
+Kegiatan Tersebut.
+5. Termasuk Dalam Kelompok Ini Adalah Situs/Portal Web Dan/Atau Platform
+Digital Yang Bertujuan Komersial (Profit) Merupakan Aplikasi Yang Digunakan
+Untuk Fasilitasi Dan/Atau Mediasi Layanan-Layanan Transaksi Elektronik,
+Seperti Pengumpul Pedagang (Marketplace), Digital Advertising, Dan On
+Demand Online Services.
+
+
+Pekerjaan Hubungi kami pada alamat berikut ini:
+PT. BIT BYTE BLUE
+Jl. Srengseng Sawah No. 79 RT 04/07
+Srengseng Sawah Jagakarsa
+Jakarta Selatan 12640
+Telp: 0895391400811
+Email: bitbyteblue@gmail.com
+Website: http://bitbyte.odoo.com
+
+
+DOKUMEN OSS
+Dokumen ini diterbitkan sistem OSS berdasarkan data dari Pelaku Usaha, tersimpan dalam sistem OSS, yang menjadi tanggung jawab
+Pelaku Usaha.
+2. Dalam hal terjadi kekeliruan isi dokumen ini akan dilakukan perbaikan sebagaimana mestinya.
+3. Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh BSrE-BSSN.
+4. Data lengkap Perizinan Berusaha dapat diperoleh melalui sistem OSS menggunakan hak akses.
+PEMERINTAH REPUBLIK INDONESIA
+PERIZINAN BERUSAHA BERBASIS RISIKO
+NOMOR INDUK BERUSAHA: 0303230077893
+Berdasarkan Peraturan Pemerintah Pengganti Undang-Undang Republik Indonesia Nomor 2 Tahun 2022 tentang Cipta Kerja,
+
+Pemerintah Republik Indonesia menerbitkan Nomor Induk Berusaha (NIB) kepada:
+NOMOR INDUK BERUSAHA (NIB): 0303230077893
+1. Nama Pelaku Usaha : PT BIT BYTE BLUE
+2. Alamat Kantor : Jl. Srengseng Sawah No. 79, Desa/Kelurahan Srengseng Sawah, Kec.
+Jagakarsa, Kota Adm. Jakarta Selatan, Provinsi DKI Jakarta,
+Kode Pos: 12640
+No. Telepon : 0895391400811
+Email : bitbyteblue@gmail.com
+3. Status Penanaman Modal : PMDN
+4. Kode Klasifikasi Baku Lapangan Usaha Indonesia
+(KBLI)
+
+: Lihat Lampiran
+5. Skala Usaha : Usaha Kecil
+
+NIB ini berlaku di seluruh wilayah Republik Indonesia selama menjalankan kegiatan usaha dan berlaku sebagai hak akses
+kepabeanan, pendaftaran kepesertaan jaminan sosial kesehatan dan jaminan sosial ketenagakerjaan, serta bukti pemenuhan
+laporan pertama Wajib Lapor Ketenagakerjaan di Perusahaan (WLKP).
+
+Pelaku Usaha dengan NIB tersebut di atas dapat melaksanakan kegiatan berusaha sebagaimana terlampir dengan tetap
+memperhatikan ketentuan peraturan perundang-undangan.
+Diterbitkan di Jakarta, tanggal: 3 Maret 2023
+
+Menteri Investasi/
+Kepala Badan Koordinasi Penanaman Modal,
+Ditandatangani secara elektronik
+Dicetak tanggal: 3 Maret 2023
+
+KEMENTERIAN HUKUM DAN HAK ASASI MANUSIA REPUBLIK INDONESIA
+SERTIFIKAT PENDAFTARAN PENDIRIAN PERSEROAN PERORANGAN
+NOMOR : AHU-017931.AH.01.30.Tahun 2023
+PT BIT BYTE BLUE
+Berkedudukan di Kota Adm. Jakarta Selatan
+telah terdaftar sebagai badan hukum dan tercatat dalam pangkalan data Direktorat Jenderal
+Administrasi Hukum Umum. Sertifikat ini berlaku sejak tanggal diterbitkan.
+Jakarta, 3 Maret 2023
+a.n. Menteri Hukum dan Hak Asasi Manusia,
+Direktur Jenderal Administrasi Hukum Umum
+KPP PRATAMA JAKARTA JAGAKARSA
+
+untuk ChatBot dan semua produk kami
+Website Resmi kami adalah:
+http://bitbyte.odoo.com
+
+
+
+03/03/2023
+No. NPWP : 40.088.583.6-068.000
+PT. BIT BYTE BLUE
+NPWP16 : 0400 8858 3606 8000
+JL. SRENGSENG SAWAH NO. 79 RT. 4 RW. 7
+SRENGSENG SAWAH, JAGAKARSA
+KOTA ADM. JAKARTA SELATAN DKI JAKARTA
+
+

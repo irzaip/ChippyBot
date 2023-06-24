@@ -7,12 +7,24 @@ import time
 import trans_id as trn
 import requests
 import random
+import db_oper as db
+import toml
+import datetime
 
-async def ask_gpt(main_obj, conv_obj: Conversation, prompt: str) -> str:
+cfg = toml.load('config.toml')
+
+async def ask_gpt(main_obj, conv_obj: Conversation, prompt: str, memory: bool = True, write_db: bool = True) -> str:
     """
     Akses API ke OpenAI, dari prompt menjadi hasil string        
     input: masuknya list dari Object Conversation.messages
     """
+    # write db bagian prompt
+    if write_db:
+        db.insert_conv(conv_obj.user_number,
+                    conv_obj.bot_number,
+                    int(datetime.datetime.utcnow().timestamp()), 
+                    prompt, cfg['CONFIG']['DB_FILE'])
+
     main_obj.antrian1 += 1
     print(f'sekarang antrian: {main_obj.antrian1}. > put')
     main_obj.queue.put_nowait(main_obj.antrian1)
@@ -37,7 +49,23 @@ async def ask_gpt(main_obj, conv_obj: Conversation, prompt: str) -> str:
     )
     ## the calling
     message = response.choices[0].message.content # type: ignore
-    conv_obj.messages.append({"role" : "assistant", "content" : message})
+    if memory:
+        conv_obj.messages.append({"role" : "assistant", "content" : message})
+    else:
+        conv_obj.messages.pop()
+
+    token_usage = (response.usage['prompt_tokens'], response.usage['completion_tokens'], response.usage['total_tokens'])
+    print("TOKEN USED:" , token_usage)
+    db.insert_token_usage(conv_obj.user_number,
+                          int(datetime.datetime.utcnow().timestamp()),
+                          token_usage,
+                          'cipibot.db')
+
+    if write_db:
+        db.insert_conv(conv_obj.user_number,
+                    conv_obj.bot_number,
+                    int(datetime.datetime.utcnow().timestamp()), 
+                    message, cfg['CONFIG']['DB_FILE'])
     await asyncio.sleep(random.randint(2,7))
 
     return message
@@ -55,8 +83,14 @@ def ask_dalle(main_obj, conv_obj: Conversation, prompt: str): # type: ignore
     return message
 
 
-async def ask_ooba(main_obj, conv_obj: Conversation, prompt: str):
-
+async def ask_ooba(main_obj, conv_obj: Conversation, prompt: str, write_db: bool = True):
+    # prompt request write to db
+    if write_db:
+        db.insert_conv(conv_obj.user_number,
+                    conv_obj.bot_number,
+                    int(datetime.datetime.utcnow().timestamp()), 
+                    prompt, cfg['CONFIG']['DB_FILE'])
+        
     main_obj.antrian2 += 1
     print(f'sekarang antrian: {main_obj.antrian2}. > put')
     main_obj.queue2.put_nowait(main_obj.antrian2)
@@ -97,13 +131,20 @@ async def ask_ooba(main_obj, conv_obj: Conversation, prompt: str):
     print(f'{Fore.CYAN}{req}{Fore.WHITE}')
     response = requests.post("http://127.0.0.1:5000/api/v1/generate", json=request)
 
-    if response.status_code == 200:
+    if response.ok:
         result = response.json()['results'][0]['text']
         conv_obj.messages.append({'role': 'assistant', 'content': trn.output_modifier(result)})
         print('\n\nResponse:\n')
         intro = intro + f"\n\nSaya:{prompt}\nMaya:{result}"
         print(f'{Fore.CYAN}{intro}{Fore.WHITE}\n\n')
-        return trn.output_modifier(result)
+        final_result = trn.output_modifier(result)
+        if write_db:
+            db.insert_conv(conv_obj.user_number,
+                        conv_obj.bot_number,
+                        int(datetime.datetime.utcnow().timestamp()), 
+                        final_result, cfg['CONFIG']['DB_FILE'])
+        
+        return final_result
     else:
         return None
     

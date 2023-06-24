@@ -8,7 +8,9 @@ from conversations import BotQuestion, ConvMode, Script, Persona, Role, ConvType
 import json
 from typing import List
 import pprint
+import toml
 
+cfg = toml.load('config.toml')
 
 server_address = 'http://127.0.0.1:8998'
 BOT_NUMBER = "6285775300227@c.us"
@@ -236,3 +238,20 @@ def toggle_free_gpt(user_number):
         print(f'{user_number} telah di toggle setting free_gpt nya')
     else:
         print(f'gagal toggle {user_number} setting free gpt')
+
+
+def send_to_phone(user_number: str, bot_number: str, message: str):
+    """send langsung ke WA, tapi ke *user_number*, bukan ke bot_number"""
+    message = {
+        "message": message, # Replace with your message text
+        "from": bot_number, # Replace with the sender number
+        "to": user_number # Replace with out bot number
+    } # type: ignore
+
+    response = requests.post(cfg['WHATSAPP']['SEND_URL'], json=message)
+
+    if response.ok:
+        return "Message sent successfully!"
+    else:
+        return f"Error sending message. Status code: {response.status_code}"
+

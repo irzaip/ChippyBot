@@ -27,7 +27,8 @@ class Persona(str, Enum):
     VOLD = auto()
     INDOSOAI = auto()
     KOBOLD = auto()
-    
+    SALES_CS = auto()
+
 class ConvType(str, Enum):
     DEMO = auto()
     FRIEND = auto()
@@ -78,12 +79,6 @@ class Message(BaseModel):
         return json.dumps(self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)
     
-class InjectedMessage(BaseModel):
-    """class message untuk injection system prompt"""
-    system_str: str
-    user_number: str
-    bot_number: str = "6285775300227@c.us"
-    send_msg : str
 
 class MessageContent(BaseModel):
     """Class untuk bikin system.message ataupun role message content"""
@@ -116,7 +111,7 @@ class Conversation():
         self.last_question = 0
         self.question_asked = ""
         self.user_name = ""
-        self.free_tries = 15
+        self.free_tries = 0
         self.profanity = False
         self.user_fullinfo = {}
         self.open_ai_key = ""
@@ -129,7 +124,7 @@ class Conversation():
         self.intro_maxs_free_gpt = 5
         self.gpt_accessed = 0
         self.gpt_token_used = 0
-        self.daily_free_gpt = 3
+        self.daily_free_gpt = 5
         self.paid_messages = 0
         self.rivebot = RiveScript()
         self.anti_flood = []
@@ -141,8 +136,16 @@ class Conversation():
         cf.add_system(self, cfg['ASSISTANT']['M_S'])
         cf.add_role_user(self, cfg['ASSISTANT']['M_U'])
         cf.add_role_assistant(self, cfg['ASSISTANT']['M_A'])
+        if self.is_group(user_number):
+            self.free_tries = 25
+        else:
+            self.free_tries = 15
 
-
+    def is_group(self, user_number: str):
+        if user_number.endswith("@g.us"):
+            return True
+        else:
+            return False
     def set_script(self, script: Script) -> None:
         all_scripts = {
             'BRAIN' : './rive/brain',
@@ -251,6 +254,9 @@ class Conversation():
             'daily_free_gpt' : self.daily_free_gpt,
             'paid_messages' : self.paid_messages,
             'free_tries' : self.free_tries,
+            'max_promo' : self.max_promo,
+            'max_funny' : self.max_funny,
+            'anti_flood' : self.anti_flood,
         }
         return json.dumps(obj)
 
@@ -285,6 +291,8 @@ class Conversation():
         self.daily_free_gpt = obj['daily_free_gpt']
         self.paid_messages = obj['paid_messages']
         self.free_tries = obj['free_tries']
+        self.max_promo = obj['max_promo']
+        self.max_funny = obj['max_funny']
         return "Done"
     
 

@@ -18,6 +18,8 @@ import subprocess
 import counting as ct
 import persona_func as pf
 import conv_func as cf
+from fastapi.middleware.cors import CORSMiddleware
+
 
 just_fix_windows_console()
 cfg = toml.load('config.toml')
@@ -34,6 +36,22 @@ logging.basicConfig(
 )
 
 app = FastAPI()
+
+origins = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:5173",
+    "http://localhost",
+    "http://localhost:9666",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 conversations = {}
 result = get_db_all_connection('cipibot.db')
 
@@ -288,6 +306,7 @@ async def reset_channel(user_number: str) -> dict[str, str]:
         return {'detail' : 'user dont exist'}
     pf.set_persona(Persona.ASSISTANT, conversations[user_number])
     pf.set_personality("Maya", "ASSISTANT", "Hai, Aku Maya, aku akan berusaha membantumu", conversations[user_number])
+    conversations[user_number].anti_flood = []
     return {'message' : 'reset done'}
 
 
