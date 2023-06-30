@@ -72,7 +72,7 @@ client.on('message', async (msg) => {
     }   
     }
   try {
-    const response = await axios.post('http://localhost:8998/messages', {
+    const response = await axios.post('http://192.168.30.50:8998/messages', {
       client: "whatsapp",
       text: msg.body,
       user_number: msg.from,

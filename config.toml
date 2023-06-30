@@ -1,6 +1,6 @@
 
 [WHATSAPP]
-SEND_URL = 'http://localhost:8000/send'
+SEND_URL = 'http://192.168.30.50:8000/send'
 
 [CONFIG]
 LOGDIR = './log/'

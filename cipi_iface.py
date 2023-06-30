@@ -12,7 +12,7 @@ import toml
 
 cfg = toml.load('config.toml')
 
-server_address = 'http://127.0.0.1:8998'
+server_address = 'http://192.168.30.50:8998'
 BOT_NUMBER = "6285775300227@c.us"
 
 def create_conv(user_number, bot_number):
