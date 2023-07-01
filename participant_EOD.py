@@ -19,8 +19,12 @@ print(result)
 
 all_users = []
 for i in aa:
-    for n in i['participants']:
-        all_users.append((n['contact_id'], n['name']))
+    for na in i['participants']:
+        try:
+            all_users.append((na['contact_id'], na['name']))
+        except:
+            replaced = na['contact_id'].replace("@c.us","")
+            all_users.append((na['contact_id'], replaced))
 
 set_users = list(set(all_users))
 
