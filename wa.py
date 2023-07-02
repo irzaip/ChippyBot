@@ -180,6 +180,7 @@ async def receive_message(message: Message) -> dict[str, str] | str:
         except Exception as err:
             print(f"{Fore.RED}{Back.WHITE}>>>>>>>>>>>>>>>> ERROR : " + f"{str(err)} <<<<<<<<<<<<<<<<<<<<<{Fore.WHITE}{Back.BLACK}")
             result = await notify_admin(f"Ada error {str(err)} nih! dari {message.user_number}") # type: ignore
+            conversation_obj.anti_flood = []
             return {"message" : return_brb()}
 
         update_db_connection(user_number=message.user_number, bot_number=message.bot_number, result=conversation_obj.get_params(), db_name='cipibot.db')
