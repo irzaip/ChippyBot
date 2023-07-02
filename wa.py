@@ -58,6 +58,7 @@ app.add_middleware(
 conversations = {}
 result = get_db_all_connection('cipibot.db')
 
+
 def add_conversation(user_number:str, bot_number: str) -> None:
     """create new conversation object"""    
     conversations.update({user_number : Conversation(user_number, bot_number)})
